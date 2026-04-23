@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="max-w-md w-full mx-4">
+        <div class="flex justify-center mb-8">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                    <rect x="4" y="7" width="13" height="9" rx="2" ry="2" />
+                    <path d="M17 12h4v4" />
+                    <circle cx="8" cy="18" r="2" />
+                    <line x1="16" y1="16" x2="20" y2="16" />
+                    <path d="M9 4v3" />
+                </svg>
+                <h1 class="text-3xl font-bold tracking-[-1px]"><span class="text-cyan-600">Vacuum</span>Store</h1>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl p-10">
+            <h2 class="text-3xl font-bold text-center mb-2">Đăng nhập</h2>
+            <p class="text-gray-500 text-center mb-8">Chào mừng bạn quay lại VacuumStore</p>
+
+            <div id="errorMessage" class="hidden bg-red-100 text-red-600 p-4 rounded-2xl mb-6 text-sm"></div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Email</label>
+                    <input id="email" type="email" placeholder="example@email.com" class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Mật khẩu</label>
+                    <input id="password" type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+                </div>
+
+                <button onclick="login()" id="loginBtn"
+                        class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 rounded-3xl font-semibold text-lg transition">
+                    Đăng nhập
+                </button>
+
+                <p class="text-center text-sm text-gray-600">
+                    Chưa có tài khoản? 
+                    <a href="register.html" class="text-cyan-600 font-medium hover:underline">Đăng ký ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+<script>
+async function login() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const errorEl = document.getElementById('errorMessage');
+    errorEl.classList.add('hidden');
+
+    if (!email || !password) {
+        errorEl.textContent = "Vui lòng nhập email và mật khẩu";
+        errorEl.classList.remove('hidden');
+        return;
+    }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang đăng nhập...`;
+
+    try {
+        const res = await fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // === REDIRECT THEO ROLE ===
+            if (data.user.role === "admin") {
+                alert("🎉 Đăng nhập Admin thành công!");
+                window.location.href = "admin/index.html";     // ← Trang chính của admin
+            } else {
+                alert("🎉 Đăng nhập thành công!");
+                window.location.href = "user-profile.html";
+            }
+        } else {
+            errorEl.textContent = data.message || "Email hoặc mật khẩu sai";
+            errorEl.classList.remove('hidden');
+        }
+    } catch (err) {
+        errorEl.textContent = "Không kết nối được server. Kiểm tra backend đang chạy chưa (node server.js)";
+        errorEl.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Đăng nhập";
+    }
+}
+</script>
+</body>
+</html>

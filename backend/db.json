@@ -1,0 +1,176 @@
+{
+  "users": [
+    {
+      "id": 1776832356165,
+      "name": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "0389873545",
+      "password": "$2b$10$qr.DKqn6QBVV498jRnRirOrSR1Hl3AtxlV5zhDoMZvNwcotZRt4TG",
+      "createdAt": "2026-04-22T04:32:36.165Z"
+    },
+    {
+      "id": 1776914729104,
+      "name": "Admin",
+      "email": "admin@vacuumstore.com",
+      "phone": "0987654321",
+      "password": "$2b$10$PUdVlFP1Lo8tZwmz6hvJkeQzr7vpahwd8mIp1D77QmOd1Wd6HO/uy",
+      "createdAt": "2026-04-23T03:25:29.105Z",
+      "role": "admin"
+    },
+    {
+      "id": 1776926069044,
+      "name": "Nguyễn Hương Giang",
+      "email": "nhz@gmail.com",
+      "phone": "0843176079",
+      "password": "$2b$10$3Gifzy7KGZdkw/8lXoB5w.nl5TA7Pr6LEFZkgN/lY4z6mThdAhq4.",
+      "role": "user",
+      "createdAt": "2026-04-23T06:34:29.044Z"
+    },
+    {
+      "id": 1776929843246,
+      "name": "zang@gmail.com",
+      "email": "zang@gmail.com",
+      "phone": "0987654321",
+      "password": "$2b$10$HMcY8yRFzyEfGofUVS/yUuDJ5E46olPTkw7QSidb5gZCFoq00t3u2",
+      "role": "user",
+      "createdAt": "2026-04-23T07:37:23.246Z"
+    },
+    {
+      "id": 1776929911868,
+      "name": "zang",
+      "email": "zang1@gmail.com",
+      "phone": "12312312312",
+      "password": "$2b$10$fVMApHBXokc4jm7Apvf5MuQCwQDD2UFjGBRE/C7B3DXA.v1KMvhMO",
+      "role": "user",
+      "createdAt": "2026-04-23T07:38:31.868Z"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "brand": "Dyson",
+      "name": "Dyson V15 Detect",
+      "price": 28990000,
+      "category": "handheld",
+      "img": "https://picsum.photos/id/1015/400/400",
+      "sold": 342
+    },
+    {
+      "id": 2,
+      "brand": "Dyson",
+      "name": "Dyson Gen5detect",
+      "price": 32990000,
+      "category": "handheld",
+      "img": "https://picsum.photos/id/102/400/400",
+      "sold": 189
+    }
+  ],
+  "orders": [
+    {
+      "id": "#VS17935046",
+      "customer": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "",
+      "address": "sơn kỳ\nsơn kỳ",
+      "items": [
+        {
+          "id": 3,
+          "name": "Dyson V12 Detect Slim",
+          "price": 18990000,
+          "qty": 1
+        }
+      ],
+      "total": 18990000,
+      "paymentMethod": "bank",
+      "date": "2026-04-23",
+      "status": "Đang xử lý",
+      "shipper": null
+    },
+    {
+      "id": "#VS18150677",
+      "customer": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "",
+      "address": "sơn kỳ\nsơn kỳ",
+      "items": [
+        {
+          "id": 1,
+          "name": "Dyson V15 Detect",
+          "price": "28.990.000",
+          "qty": 1
+        }
+      ],
+      "total": "028.990.000",
+      "paymentMethod": "cod",
+      "date": "2026-04-23",
+      "status": "Đang xử lý",
+      "shipper": null
+    },
+    {
+      "id": "#VS18323817",
+      "customer": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "",
+      "address": "sơn kỳ\nsơn kỳ",
+      "items": [
+        {
+          "id": 1,
+          "name": "Dyson V15 Detect",
+          "price": 28990000,
+          "qty": 1
+        },
+        {
+          "id": 2,
+          "name": "Dyson Gen5detect",
+          "price": 32990000,
+          "qty": 1
+        }
+      ],
+      "total": 61980000,
+      "paymentMethod": "cod",
+      "date": "2026-04-23",
+      "status": "Đang xử lý",
+      "shipper": null
+    },
+    {
+      "id": "#VS23300908",
+      "customer": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "",
+      "address": "sơn kỳ\nsơn kỳ",
+      "items": [
+        {
+          "id": 1,
+          "name": "Dyson V15 Detect",
+          "price": 28990000,
+          "qty": 1
+        }
+      ],
+      "total": 28990000,
+      "paymentMethod": "cod",
+      "date": "2026-04-23",
+      "status": "Đang xử lý",
+      "shipper": null
+    },
+    {
+      "id": "#VS23440691",
+      "customer": "Do Dang Khoa",
+      "email": "dodangkhoa1512@gmail.com",
+      "phone": "",
+      "address": "sơn kỳ\nsơn kỳ",
+      "items": [
+        {
+          "id": 1,
+          "name": "Dyson V15 Detect",
+          "price": 28990000,
+          "qty": 1
+        }
+      ],
+      "total": 28990000,
+      "paymentMethod": "cod",
+      "date": "2026-04-23",
+      "status": "Đang xử lý",
+      "shipper": null
+    }
+  ]
+}

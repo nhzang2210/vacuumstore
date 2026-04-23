@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt hàng thành công - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @media print {
+            nav, .no-print { display: none !important; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                    <rect x="4" y="7" width="13" height="9" rx="2" ry="2" />
+                    <path d="M17 12h4v4" />
+                    <circle cx="8" cy="18" r="2" />
+                    <line x1="16" y1="16" x2="20" y2="16" />
+                    <path d="M9 4v3" />
+                </svg>
+                <h1 class="text-3xl font-bold tracking-[-1px]"><span class="text-cyan-600">Vacuum</span>Store</h1>
+            </div>
+            <a href="index.html" class="text-cyan-600 font-medium">Về trang chủ</a>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-2xl mx-auto px-6 py-16 text-center">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 text-green-600 rounded-3xl mb-6">
+        <i class="fa-solid fa-check text-5xl"></i>
+    </div>
+    
+    <h1 class="text-4xl font-bold text-green-600 mb-2">Đặt hàng thành công!</h1>
+    <p class="text-gray-600 text-lg">Cảm ơn bạn đã mua hàng tại VacuumStore</p>
+
+    <div class="mt-10 bg-white rounded-3xl shadow p-8 text-left">
+        <!-- Mã đơn hàng -->
+        <div class="flex justify-between items-center border-b pb-4">
+            <p class="font-semibold text-lg">Mã đơn hàng</p>
+            <p class="text-xl font-bold text-cyan-600" id="orderId">#VS20260422-7842</p>
+        </div>
+
+        <!-- Thông tin khách hàng -->
+        <div class="mt-6 grid grid-cols-1 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Khách hàng</p>
+                <p class="font-medium text-lg" id="customerName">Nguyễn Văn A</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Số điện thoại</p>
+                <p class="font-medium" id="customerPhone">0912 345 678</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Địa chỉ nhận hàng</p>
+                <p class="font-medium" id="customerAddress">123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</p>
+            </div>
+        </div>
+
+        <!-- Ngày giao dự kiến -->
+        <div class="mt-8 bg-cyan-50 border border-cyan-200 rounded-2xl p-5">
+            <p class="flex items-center gap-2 text-cyan-700 font-medium">
+                <i class="fa-solid fa-truck"></i>
+                Dự kiến giao hàng
+            </p>
+            <p class="text-xl font-semibold text-cyan-800 mt-1" id="deliveryDate">24/04/2026 - 26/04/2026</p>
+            <p class="text-sm text-cyan-600 mt-1">Giao hàng trong 2-3 ngày làm việc</p>
+        </div>
+
+        <!-- Sản phẩm -->
+        <div class="mt-8">
+            <p class="text-sm text-gray-500 mb-3">Sản phẩm đã đặt</p>
+            <div id="orderItems" class="space-y-4"></div>
+        </div>
+
+        <!-- Tổng tiền -->
+        <div class="border-t mt-8 pt-6 flex justify-between text-2xl font-bold">
+            <span>Tổng thanh toán</span>
+            <span id="finalTotal" class="text-cyan-600">0đ</span>
+        </div>
+    </div>
+
+    <div class="mt-10 flex flex-col gap-4">
+        <button onclick="printInvoice()" 
+                class="print-btn flex items-center justify-center gap-3 bg-cyan-600 text-white py-5 rounded-3xl text-lg font-semibold hover:bg-cyan-700 transition">
+            <i class="fa-solid fa-print"></i>
+            IN HÓA ĐƠN
+        </button>
+
+        <a href="user-profile.html" class="block w-full border border-gray-300 py-5 rounded-3xl text-lg font-semibold hover:bg-gray-50 transition">
+            Xem đơn hàng của tôi
+        </a>
+        <a href="index.html" class="block w-full border border-gray-300 py-5 rounded-3xl text-lg font-semibold hover:bg-gray-50 transition">
+            Về trang chủ
+        </a>
+    </div>
+</div>
+
+<script>
+// Lấy giỏ hàng
+const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Render trang xác nhận
+function renderConfirmation() {
+    let subtotal = 0;
+    let html = '';
+
+    cart.forEach(item => {
+        const qty = item.quantity || 1;
+        const price = parseInt(item.price);
+        const total = price * qty;
+        subtotal += total;
+
+        html += `
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-medium">${item.name}</p>
+                    <p class="text-sm text-gray-500">x${qty}</p>
+                </div>
+                <p class="font-semibold">${total.toLocaleString('vi-VN')}đ</p>
+            </div>`;
+    });
+
+    document.getElementById('orderItems').innerHTML = html;
+    document.getElementById('finalTotal').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
+
+    // Thông tin khách hàng (bạn có thể thay đổi động sau)
+    document.getElementById('customerName').textContent = "Nguyễn Văn A";
+    document.getElementById('customerPhone').textContent = "0912 345 678";
+    document.getElementById('customerAddress').textContent = "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh";
+
+    // Mã đơn hàng ngẫu nhiên
+    document.getElementById('orderId').textContent = "#VS" + Date.now().toString().slice(-8);
+}
+
+// In hóa đơn
+function printInvoice() {
+    window.print();
+}
+
+// Xóa giỏ hàng sau khi xác nhận
+localStorage.removeItem('cart');
+
+renderConfirmation();
+</script>
+</body>
+</html>

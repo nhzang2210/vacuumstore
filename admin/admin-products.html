@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - VacuumStore Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<div class="flex h-screen">
+    <!-- Sidebar (đã chuẩn hóa giống các trang khác) -->
+    <div class="w-72 sidebar text-white p-6 flex flex-col" style="background: linear-gradient(180deg, #1e2937, #0f172a);">
+        <div class="flex items-center gap-3 mb-10 px-3">
+            <i class="fa-solid fa-robot text-4xl"></i>
+            <h1 class="text-3xl font-bold">VacuumStore</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+    <a href="index.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-box"></i> Quản lý đơn hàng</a>
+    <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</a>
+    <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-warehouse"></i> Kho hàng</a>
+    <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-users"></i> Khách hàng</a>
+</nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <header class="bg-white px-8 py-5 flex justify-between items-center shadow">
+            <h1 class="text-3xl font-bold">Quản lý Sản phẩm</h1>
+            <div class="flex gap-4">
+                <input id="searchInput" placeholder="Tìm kiếm sản phẩm..." class="border border-gray-300 rounded-3xl px-5 py-3 w-80 focus:outline-none">
+                <button onclick="showAddModal()" class="bg-cyan-600 text-white px-6 py-3 rounded-3xl flex items-center gap-2 hover:bg-cyan-700">
+                    <i class="fa-solid fa-plus"></i> Thêm sản phẩm
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <div class="bg-white rounded-3xl shadow overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b text-gray-500 text-sm">
+                            <th class="px-6 py-5 text-left">Hình ảnh</th>
+                            <th class="px-6 py-5 text-left">Tên sản phẩm</th>
+                            <th class="px-6 py-5 text-left">Thương hiệu</th>
+                            <th class="px-6 py-5 text-left">Giá</th>
+                            <th class="px-6 py-5 text-left">Danh mục</th>
+                            <th class="px-6 py-5 text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTable" class="text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm / Sửa -->
+<div id="productModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl w-full max-w-lg mx-4 p-8 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-2xl font-bold mb-6" id="modalTitle">Thêm sản phẩm mới</h3>
+
+        <!-- Upload nhiều ảnh -->
+        <div class="mb-6">
+            <label class="block text-sm text-gray-600 mb-2">Hình ảnh sản phẩm (có thể chọn nhiều)</label>
+            <button onclick="document.getElementById('imageInput').click()" 
+                    class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl hover:border-cyan-300 flex flex-col items-center">
+                <i class="fa-solid fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                <span class="text-gray-600">Chọn nhiều ảnh</span>
+            </button>
+            <input type="file" id="imageInput" accept="image/*" multiple class="hidden">
+            <div id="imagePreviewContainer" class="grid grid-cols-5 gap-3 mt-4"></div>
+        </div>
+
+        <!-- Tên sản phẩm -->
+        <input id="modalName" placeholder="Tên sản phẩm" class="w-full border border-gray-300 rounded-2xl px-5 py-4 mb-4">
+
+        <!-- Giá -->
+        <input id="modalPrice" type="number" placeholder="Giá (VND)" class="w-full border border-gray-300 rounded-2xl px-5 py-4 mb-4">
+
+        <!-- Thương hiệu & Danh mục -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <select id="modalBrand" class="border border-gray-300 rounded-2xl px-5 py-4">
+                <option value="Dyson">Dyson</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="Roborock">Roborock</option>
+                <option value="Electrolux">Electrolux</option>
+                <option value="Bosch">Bosch</option>
+            </select>
+            <select id="modalCategory" class="border border-gray-300 rounded-2xl px-5 py-4">
+                <option value="robot">Robot hút bụi</option>
+                <option value="handheld">Máy hút bụi cầm tay</option>
+            </select>
+        </div>
+
+        <!-- Mô tả sản phẩm -->
+        <div>
+            <label class="block text-sm text-gray-600 mb-2">Mô tả sản phẩm</label>
+            <textarea id="modalDesc" rows="4" placeholder="Mô tả chi tiết sản phẩm..." 
+                      class="w-full border border-gray-300 rounded-2xl px-5 py-4 resize-y"></textarea>
+        </div>
+
+        <div class="mt-8 flex gap-4">
+            <button onclick="closeModal()" class="flex-1 py-4 border border-gray-300 rounded-3xl text-gray-700">Hủy</button>
+            <button onclick="saveProduct()" class="flex-1 bg-cyan-600 text-white py-4 rounded-3xl">Lưu sản phẩm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// === PHẦN QUAN TRỌNG: DÙNG KEY CHUNG "products" ===
+let products = JSON.parse(localStorage.getItem('products')) || [];
+
+let editingId = null;
+let currentImages = [];
+
+function renderProducts() {
+    const tbody = document.getElementById('productTable');
+    tbody.innerHTML = '';
+
+    products.forEach(p => {
+        const mainImg = p.images && p.images.length > 0 ? p.images[0] : "https://picsum.photos/id/1015/400/400";
+        tbody.innerHTML += `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-6 py-4">
+                    <img src="${mainImg}" class="w-12 h-12 object-cover rounded-xl">
+                </td>
+                <td class="px-6 py-4 font-medium">${p.name}</td>
+                <td class="px-6 py-4">${p.brand}</td>
+                <td class="px-6 py-4 font-semibold text-cyan-600">${p.price.toLocaleString('vi-VN')}đ</td>
+                <td class="px-6 py-4">${p.category === 'robot' ? 'Robot hút bụi' : 'Cầm tay'}</td>
+                <td class="px-6 py-4 text-center">
+                    <button onclick="editProduct(${p.id})" class="text-cyan-600 hover:text-cyan-700 mr-4">Sửa</button>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-600">Xóa</button>
+                </td>
+            </tr>`;
+    });
+}
+
+// Modal
+function showAddModal() {
+    editingId = null;
+    currentImages = [];
+    document.getElementById('modalTitle').textContent = 'Thêm sản phẩm mới';
+    document.getElementById('modalName').value = '';
+    document.getElementById('modalPrice').value = '';
+    document.getElementById('modalDesc').value = '';
+    document.getElementById('imagePreviewContainer').innerHTML = '';
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('productModal').classList.add('hidden');
+}
+
+// Upload nhiều ảnh + preview
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            currentImages.push(ev.target.result);
+            renderImagePreview();
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+function renderImagePreview() {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+    currentImages.forEach((src, index) => {
+        const div = document.createElement('div');
+        div.className = "relative";
+        div.innerHTML = `
+            <img src="${src}" class="w-16 h-16 object-cover rounded-xl border">
+            <button onclick="removePreviewImage(${index}); event.stopImmediatePropagation()" 
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">×</button>`;
+        container.appendChild(div);
+    });
+}
+
+function removePreviewImage(index) {
+    currentImages.splice(index, 1);
+    renderImagePreview();
+}
+
+// Lưu sản phẩm
+function saveProduct() {
+    const name = document.getElementById('modalName').value.trim();
+    const price = parseInt(document.getElementById('modalPrice').value);
+    const brand = document.getElementById('modalBrand').value;
+    const category = document.getElementById('modalCategory').value;
+    const desc = document.getElementById('modalDesc').value.trim();
+
+    if (!name || !price) {
+        alert("Vui lòng nhập tên và giá sản phẩm!");
+        return;
+    }
+
+    if (editingId) {
+        const p = products.find(x => x.id === editingId);
+        p.name = name;
+        p.price = price;
+        p.brand = brand;
+        p.category = category;
+        p.desc = desc;
+        if (currentImages.length > 0) p.images = [...currentImages];
+    } else {
+        products.push({
+            id: Date.now(),
+            name: name,
+            brand: brand,
+            price: price,
+            category: category,
+            desc: desc,
+            images: currentImages.length > 0 ? [...currentImages] : ["https://picsum.photos/id/1015/400/400"]
+        });
+    }
+
+    localStorage.setItem('products', JSON.stringify(products));
+    closeModal();
+    renderProducts();
+}
+
+function editProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+
+    editingId = id;
+    currentImages = p.images ? [...p.images] : [];
+
+    document.getElementById('modalTitle').textContent = 'Sửa sản phẩm';
+    document.getElementById('modalName').value = p.name;
+    document.getElementById('modalPrice').value = p.price;
+    document.getElementById('modalBrand').value = p.brand;
+    document.getElementById('modalCategory').value = p.category;
+    document.getElementById('modalDesc').value = p.desc || '';
+
+    renderImagePreview();
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function deleteProduct(id) {
+    if (confirm("Xóa sản phẩm này?")) {
+        products = products.filter(p => p.id !== id);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderProducts();
+    }
+}
+
+// Khởi chạy
+renderProducts();
+</script>
+</body>
+</html>

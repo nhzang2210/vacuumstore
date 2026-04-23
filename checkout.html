@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- NAVBAR -->
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                    <rect x="4" y="7" width="13" height="9" rx="2" ry="2" />
+                    <path d="M17 12h4v4" />
+                    <circle cx="8" cy="18" r="2" />
+                    <line x1="16" y1="16" x2="20" y2="16" />
+                    <path d="M9 4v3" />
+                </svg>
+                <h1 class="text-3xl font-bold tracking-[-1px]"><span class="text-cyan-600">Vacuum</span>Store</h1>
+            </div>
+            <a href="cart.html" class="flex items-center gap-2 text-cyan-600 font-medium">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại giỏ hàng
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+    <h1 class="text-4xl font-bold mb-8">Thanh toán</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Thông tin giao hàng -->
+        <div class="lg:col-span-7 bg-white rounded-3xl shadow p-8">
+            <h2 class="text-2xl font-semibold mb-6">Thông tin giao hàng</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Họ và tên *</label>
+                    <input id="fullName" type="text" class="w-full border border-gray-300 rounded-3xl px-5 py-4 focus:outline-none focus:border-cyan-500" value="Nguyễn Văn A">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Số điện thoại *</label>
+                    <input id="phone" type="text" class="w-full border border-gray-300 rounded-3xl px-5 py-4 focus:outline-none focus:border-cyan-500" value="0389873545">
+                </div>
+            </div>
+            <div class="mt-6">
+                <label class="block text-sm font-medium mb-2">Địa chỉ nhận hàng *</label>
+                <input id="address" type="text" class="w-full border border-gray-300 rounded-3xl px-5 py-4 focus:outline-none focus:border-cyan-500" value="123 Đường ABC, Quận 1, TP.HCM">
+            </div>
+
+            <!-- Mã giảm giá -->
+            <div class="mt-8">
+                <label class="block text-sm font-medium mb-2">Mã giảm giá</label>
+                <div class="flex gap-3">
+                    <input id="voucherCode" type="text" placeholder="Nhập mã giảm giá" class="flex-1 border border-gray-300 rounded-3xl px-5 py-4 focus:outline-none focus:border-cyan-500">
+                    <button onclick="applyVoucher()" class="bg-cyan-600 text-white px-8 rounded-3xl hover:bg-cyan-700">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đơn hàng của bạn -->
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-3xl shadow p-8">
+                <h2 class="text-2xl font-semibold mb-6">Đơn hàng của bạn</h2>
+                <div id="orderItems" class="space-y-6"></div>
+
+                <div class="mt-8 pt-6 border-t">
+                    <div class="flex justify-between mb-2"><span class="text-gray-600">Tạm tính</span><span id="subtotalText" class="font-medium"></span></div>
+                    <div class="flex justify-between mb-2"><span class="text-gray-600">Giảm giá</span><span id="discountText" class="text-green-600">0đ</span></div>
+                    <div class="flex justify-between mb-2"><span class="text-gray-600">Phí giao hàng</span><span class="text-green-600">Miễn phí</span></div>
+                    <hr class="my-4">
+                    <div class="flex justify-between text-xl"><span class="font-semibold">Tổng thanh toán</span><span id="totalText" class="font-bold text-cyan-600"></span></div>
+                </div>
+
+                <!-- Phương thức thanh toán -->
+                <div class="mt-8">
+                    <label class="block text-sm font-medium mb-3">Phương thức thanh toán</label>
+                    <select id="payment-method" onchange="togglePaymentBox()" class="w-full border border-gray-300 rounded-3xl px-5 py-4 focus:outline-none focus:border-cyan-500">
+                        <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+                        <option value="bank">Chuyển khoản ngân hàng</option>
+                    </select>
+                </div>
+
+                <!-- QR Bank -->
+                <div id="payment-box" class="hidden mt-6 bg-gray-50 rounded-3xl p-6 text-center">
+                    <p class="text-sm text-gray-600 mb-4">Quét mã QR để thanh toán</p>
+                    <img id="qr-img" src="" class="mx-auto rounded-2xl shadow" alt="QR Code">
+                    <p class="text-xs text-gray-500 mt-4">Techcombank • 19076071881013<br>Nguyễn Văn A</p>
+                </div>
+
+                <button onclick="placeOrder()" class="mt-10 w-full bg-black text-white py-6 rounded-3xl text-xl font-semibold hover:bg-cyan-600 transition">
+                    XÁC NHẬN ĐẶT HÀNG
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load sản phẩm mới nhất từ admin
+let allProducts = JSON.parse(localStorage.getItem('products')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let discountAmount = 0;
+
+// Render đơn hàng
+function renderOrderSummary() {
+    const container = document.getElementById('orderItems');
+    container.innerHTML = '';
+
+    let subtotal = 0;
+
+    cart.forEach(item => {
+        const latest = allProducts.find(p => p.id === item.id) || item;
+        const imageUrl = latest.images && latest.images.length > 0 
+            ? latest.images[0] 
+            : (latest.img || "https://picsum.photos/id/1015/400/400");
+        
+        const price = latest.price;
+        const qty = item.qty || 1;
+        subtotal += price * qty;
+
+        container.innerHTML += `
+            <div class="flex gap-4">
+                <img src="${imageUrl}" class="w-20 h-20 object-cover rounded-2xl" alt="${latest.name}">
+                <div class="flex-1">
+                    <p class="text-xs text-gray-500">${latest.brand}</p>
+                    <h4 class="font-medium">${latest.name}</h4>
+                    <p class="text-sm text-gray-500">${qty} × ${price.toLocaleString('vi-VN')}đ</p>
+                </div>
+                <div class="font-semibold text-right">${(price * qty).toLocaleString('vi-VN')}đ</div>
+            </div>`;
+    });
+
+    const total = subtotal - discountAmount;
+    document.getElementById('subtotalText').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('discountText').textContent = discountAmount > 0 ? '-' + discountAmount.toLocaleString('vi-VN') + 'đ' : '0đ';
+    document.getElementById('totalText').textContent = total.toLocaleString('vi-VN') + 'đ';
+}
+
+// Áp dụng mã giảm giá
+function applyVoucher() {
+    const code = document.getElementById('voucherCode').value.trim().toUpperCase();
+    let discount = 0;
+    if (code === 'SALE10') discount = 100000;
+    else if (code === 'VACUUM20') discount = 200000;
+    else if (code === 'FREESHIP') discount = 30000;
+    else return alert('Mã giảm giá không hợp lệ!');
+
+    discountAmount = discount;
+    renderOrderSummary();
+    alert('✅ Mã giảm giá đã được áp dụng!');
+}
+
+// Hiển thị QR khi chọn chuyển khoản
+function togglePaymentBox() {
+    const method = document.getElementById('payment-method').value;
+    const box = document.getElementById('payment-box');
+    const total = parseInt(document.getElementById('totalText').innerText.replace(/\D/g, ''));
+
+    if (method === 'bank') {
+        box.style.display = 'block';
+        document.getElementById('qr-img').src = `https://img.vietqr.io/image/TCB-19076071881013-compact2.png?amount=${total}&addInfo=VacuumStore%20Order`;
+    } else {
+        box.style.display = 'none';
+    }
+}
+
+// Đặt hàng
+function placeOrder() {
+    if (cart.length === 0) return alert("Giỏ hàng trống!");
+
+    const order = {
+        id: "#MH" + String(Date.now()).slice(-6),
+        date: new Date().toLocaleDateString('vi-VN'),
+        customer: document.getElementById('fullName').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        items: cart.map(item => {
+            const p = allProducts.find(prod => prod.id === item.id) || item;
+            return { id: p.id, name: p.name, price: p.price, qty: item.qty || 1 };
+        }),
+        total: parseInt(document.getElementById('totalText').innerText.replace(/\D/g, '')),
+        status: "Đang xử lý",
+        shipper: null
+    };
+
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.unshift(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    localStorage.removeItem('cart');
+
+    alert(`🎉 Đặt hàng thành công!\nMã đơn hàng: ${order.id}`);
+    window.location.href = `order-confirmation.html?orderId=${order.id}`;
+}
+
+// Khởi chạy
+window.addEventListener('load', () => {
+    renderOrderSummary();
+    togglePaymentBox(); // init QR nếu cần
+});
+</script>
+</body>
+</html>

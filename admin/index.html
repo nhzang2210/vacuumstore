@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - VacuumStore Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        .sidebar { background: linear-gradient(180deg, #1e2937, #0f172a); }
+        .stat-card { transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-72 sidebar text-white p-6 flex flex-col">
+        <div class="flex items-center gap-3 mb-10 px-3">
+            <i class="fa-solid fa-robot text-4xl"></i>
+            <h1 class="text-3xl font-bold">VacuumStore</h1>
+        </div>
+       <nav class="flex-1 space-y-2">
+    <a href="index.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-box"></i> Quản lý đơn hàng</a>
+    <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</a>
+    <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-warehouse"></i> Kho hàng</a>
+    <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-users"></i> Khách hàng</a>
+</nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <header class="bg-white shadow px-8 py-5 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            <div class="flex items-center gap-6">
+                <div class="relative">
+                    <input type="text" placeholder="Tìm kiếm..." class="bg-gray-100 border border-gray-200 rounded-3xl px-5 py-3 pl-10 w-80 focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="text-right">
+                        <p class="font-medium">Admin</p>
+                        <p class="text-xs text-gray-500">Quản trị viên</p>
+                    </div>
+                    <i class="fa-solid fa-circle-user text-4xl text-cyan-600"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="stat-card bg-white rounded-3xl p-6 shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm">Tổng đơn hàng</p>
+                            <p id="totalOrders" class="text-4xl font-bold mt-2">0</p>
+                        </div>
+                        <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center text-3xl">📦</div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white rounded-3xl p-6 shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm">Doanh thu</p>
+                            <p id="revenue" class="text-4xl font-bold mt-2">0 tỷ</p>
+                        </div>
+                        <div class="bg-green-100 text-green-600 w-12 h-12 rounded-2xl flex items-center justify-center text-3xl">💰</div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white rounded-3xl p-6 shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm">Khách hàng</p>
+                            <p id="totalCustomers" class="text-4xl font-bold mt-2">0</p>
+                        </div>
+                        <div class="bg-purple-100 text-purple-600 w-12 h-12 rounded-2xl flex items-center justify-center text-3xl">👥</div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white rounded-3xl p-6 shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm">Sản phẩm</p>
+                            <p id="totalProducts" class="text-4xl font-bold mt-2">50</p>
+                        </div>
+                        <div class="bg-cyan-100 text-cyan-600 w-12 h-12 rounded-2xl flex items-center justify-center text-3xl">🧹</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Đơn hàng gần đây -->
+                <div class="lg:col-span-6 bg-white rounded-3xl shadow p-6">
+                    <h2 class="text-xl font-semibold mb-6">Đơn hàng gần đây</h2>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-gray-500 border-b">
+                                <th class="text-left py-4">Mã đơn</th>
+                                <th class="text-left py-4">Khách hàng</th>
+                                <th class="text-right py-4">Tổng tiền</th>
+                                <th class="text-center py-4">Trạng thái</th>
+                                <th class="text-right py-4">Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable" class="text-sm"></tbody>
+                    </table>
+                </div>
+
+                <!-- Khách hàng gần đây (dữ liệu thật) -->
+                <div class="lg:col-span-6 bg-white rounded-3xl shadow p-6">
+                    <h2 class="text-xl font-semibold mb-6">Khách hàng gần đây</h2>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-gray-500 border-b">
+                                <th class="text-left py-4">Khách hàng</th>
+                                <th class="text-left py-4">Số điện thoại</th>
+                                <th class="text-right py-4">Số đơn</th>
+                                <th class="text-right py-4">Tổng chi tiêu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentCustomersTable" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load users giống admin-customers.html
+function getAllUsers() {
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    const singleUser = JSON.parse(localStorage.getItem('user'));
+    if (singleUser) {
+        const exists = users.some(u => u.email === singleUser.email);
+        if (!exists) users = [singleUser, ...users];
+    }
+    return users;
+}
+
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+// Stats
+function calculateStats() {
+    const totalOrdersCount = orders.length;
+    const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+    
+    document.getElementById('totalOrders').textContent = totalOrdersCount.toLocaleString('vi-VN');
+    document.getElementById('revenue').innerHTML = (revenue / 1000000000).toFixed(1) + ' <span class="text-2xl">tỷ</span>';
+    
+    // Tổng khách hàng thật
+    const users = getAllUsers();
+    document.getElementById('totalCustomers').textContent = users.length.toLocaleString('vi-VN');
+    
+    document.getElementById('totalProducts').textContent = 50;
+}
+
+// Đơn hàng gần đây
+function renderRecentOrders() {
+    const tbody = document.getElementById('recentOrdersTable');
+    tbody.innerHTML = '';
+    const recent = orders.slice(0, 5);
+    recent.forEach(order => {
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50';
+        row.innerHTML = `
+            <td class="py-4">${order.id}</td>
+            <td class="py-4">${order.customer || 'Khách hàng'}</td>
+            <td class="py-4 text-right font-medium">${order.total ? order.total.toLocaleString('vi-VN') + 'đ' : '0đ'}</td>
+            <td class="py-4 text-center">
+                <span class="px-4 py-1 rounded-3xl text-xs font-medium ${order.status === 'Hoàn thành' ? 'bg-green-100 text-green-700' : order.status === 'Đang giao' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">
+                    ${order.status || 'Đang xử lý'}
+                </span>
+            </td>
+            <td class="py-4 text-right text-gray-500">${order.date || 'Hôm nay'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Khách hàng gần đây - DỮ LIỆU THẬT (đồng bộ với admin-customers)
+function renderRecentCustomers() {
+    const tbody = document.getElementById('recentCustomersTable');
+    tbody.innerHTML = '';
+
+    const customerMap = {};
+    orders.forEach(order => {
+        const key = order.customer || 'Khách lạ';
+        if (!customerMap[key]) {
+            customerMap[key] = { 
+                name: key, 
+                phone: order.phone || 'Chưa có', 
+                count: 0, 
+                total: 0 
+            };
+        }
+        customerMap[key].count++;
+        customerMap[key].total += (order.total || 0);
+    });
+
+    // Merge với user đã đăng ký
+    const users = getAllUsers();
+    users.forEach(user => {
+        const key = user.name;
+        if (customerMap[key]) {
+            customerMap[key].phone = user.phone || customerMap[key].phone;
+        } else {
+            customerMap[key] = {
+                name: user.name,
+                phone: user.phone || 'Chưa có',
+                count: 0,
+                total: 0
+            };
+        }
+    });
+
+    // Hiển thị tối đa 6 khách hàng gần nhất
+    Object.values(customerMap).slice(0, 6).forEach(c => {
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50';
+        row.innerHTML = `
+            <td class="py-4">${c.name}</td>
+            <td class="py-4">${c.phone}</td>
+            <td class="py-4 text-right font-medium">${c.count}</td>
+            <td class="py-4 text-right font-medium">${c.total.toLocaleString('vi-VN')}đ</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Khởi chạy
+window.addEventListener('load', () => {
+    calculateStats();
+    renderRecentOrders();
+    renderRecentCustomers();
+});
+</script>
+</body>
+</html>

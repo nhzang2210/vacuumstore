@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên hệ - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Dán navbar ở trên vào đây (hoặc copy từ index.html) -->
+
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <h1 class="text-4xl font-bold text-center mb-4">Liên hệ với chúng tôi</h1>
+        <p class="text-center text-gray-600 mb-12">Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>
+
+        <div class="grid md:grid-cols-2 gap-12">
+            <!-- Form liên hệ -->
+            <div class="bg-white rounded-3xl shadow p-8">
+                <form id="contactForm">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="Họ và tên" class="border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500" required>
+                        <input type="email" placeholder="Email" class="border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500" required>
+                    </div>
+                    <input type="tel" placeholder="Số điện thoại" class="mt-4 w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500" required>
+                    <textarea placeholder="Nội dung tin nhắn..." rows="6" class="mt-4 w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500" required></textarea>
+                    <button type="submit" class="mt-6 w-full bg-cyan-600 text-white py-4 rounded-3xl font-semibold hover:bg-cyan-700 transition">Gửi tin nhắn</button>
+                </form>
+            </div>
+
+            <!-- Thông tin liên hệ -->
+            <div class="space-y-8">
+                <div class="flex gap-4">
+                    <i class="fa-solid fa-phone text-4xl text-pink-500 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-xl">Hotline</p>
+                        <p class="text-3xl font-bold text-cyan-600">0843 176 079</p>
+                        <p class="text-sm text-gray-500">(Hỗ trợ 24/7)</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <i class="fa-solid fa-envelope text-4xl text-cyan-500 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-xl">Email</p>
+                        <p class="text-cyan-600">hotro@vacuumstore.vn</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <i class="fa-solid fa-map-marker-alt text-4xl text-amber-500 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-xl">Địa chỉ</p>
+                        <p>236,Lê Văn Sỹ ,Phường 1 ,Tân Sơn Hòa ,TPHCM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('✅ Cảm ơn bạn! Chúng tôi sẽ liên hệ trong vòng 5 phút.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

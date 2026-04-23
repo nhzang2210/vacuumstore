@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản của tôi - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #0ea5e9, #06b67f); }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                    <rect x="4" y="7" width="13" height="9" rx="2" ry="2" />
+                    <path d="M17 12h4v4" />
+                    <circle cx="8" cy="18" r="2" />
+                    <line x1="16" y1="16" x2="20" y2="16" />
+                    <path d="M9 4v3" />
+                </svg>
+                <h1 class="text-3xl font-bold tracking-[-1px]"><span class="text-cyan-600">Vacuum</span>Store</h1>
+            </div>
+            <a href="index.html" class="text-cyan-600 font-medium">Về trang chủ</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Background giống index.html -->
+<div class="hero-bg text-white py-8">
+    <div class="max-w-7xl mx-auto px-6 flex items-center gap-4">
+        <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-3xl flex items-center justify-center text-4xl">👤</div>
+        <div>
+            <p class="text-3xl font-bold" id="displayName">Nguyễn Văn A</p>
+            <p class="text-white/80" id="displayEmail">nguyenvana@gmail.com</p>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-8 flex gap-8">
+    <!-- Sidebar -->
+    <div class="w-72 bg-white rounded-3xl shadow p-6 h-fit sticky top-8">
+        <div onclick="switchTab(0)" class="tab-item flex items-center gap-3 px-4 py-4 rounded-2xl cursor-pointer hover:bg-gray-100 mb-2" id="tab0">
+            <i class="fa-solid fa-user"></i> Thông tin cá nhân
+        </div>
+        <div onclick="switchTab(1)" class="tab-item flex items-center gap-3 px-4 py-4 rounded-2xl cursor-pointer hover:bg-gray-100 mb-2 active" id="tab1">
+            <i class="fa-solid fa-receipt"></i> Đơn hàng của tôi
+        </div>
+        <div onclick="switchTab(2)" class="tab-item flex items-center gap-3 px-4 py-4 rounded-2xl cursor-pointer hover:bg-gray-100 mb-2" id="tab2">
+            <i class="fa-solid fa-map-marker-alt"></i> Địa chỉ giao hàng
+        </div>
+        <div onclick="switchTab(3)" class="tab-item flex items-center gap-3 px-4 py-4 rounded-2xl cursor-pointer hover:bg-gray-100" id="tab3">
+            <i class="fa-solid fa-heart"></i> Sản phẩm yêu thích
+        </div>
+
+        <div onclick="logout()" class="mt-12 pt-6 border-t text-red-500 hover:text-red-600 cursor-pointer flex items-center gap-3 px-4 py-3">
+            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1">
+        <!-- Tab 0: Thông tin cá nhân -->
+        <div id="tab-0" class="tab-content">
+            <div class="bg-white rounded-3xl shadow p-8 max-w-2xl">
+                <h2 class="text-2xl font-bold mb-6">Thông tin cá nhân</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Họ và tên</label>
+                        <input id="profileName" type="text" value="Nguyễn Văn A" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Số điện thoại</label>
+                        <input id="profilePhone" type="tel" value="0912345678" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Email</label>
+                        <input id="profileEmail" type="email" value="nguyenvana@gmail.com" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <button onclick="saveProfile()" class="bg-cyan-600 text-white px-10 py-4 rounded-3xl font-semibold hover:bg-cyan-700">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: Đơn hàng của tôi -->
+        <div id="tab-1" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6">Đơn hàng của tôi</h2>
+            <div id="ordersList" class="space-y-4"></div>
+        </div>
+
+        <!-- Tab 2: Địa chỉ giao hàng -->
+        <div id="tab-2" class="tab-content hidden">
+            <div class="bg-white rounded-3xl shadow p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Địa chỉ giao hàng</h2>
+                    <button onclick="showAddAddressModal()" class="bg-cyan-600 text-white px-6 py-3 rounded-3xl flex items-center gap-2 hover:bg-cyan-700">
+                        <i class="fa-solid fa-plus"></i> Thêm địa chỉ mới
+                    </button>
+                </div>
+                <div id="addressList" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Sản phẩm yêu thích -->
+        <div id="tab-3" class="tab-content hidden">
+            <div class="bg-white rounded-3xl shadow p-8">
+                <h2 class="text-2xl font-bold mb-6">Sản phẩm yêu thích</h2>
+                <div id="wishlistGrid" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL CHI TIẾT ĐƠN HÀNG ==================== -->
+<div id="orderDetailModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div class="bg-white rounded-3xl max-w-4xl w-full mx-4 overflow-hidden">
+        <div class="p-8" id="modalDetailContent"></div>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Địa chỉ -->
+<div id="addressModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
+    <div class="bg-white rounded-3xl w-full max-w-lg mx-4 p-8">
+        <h3 class="text-2xl font-bold mb-6" id="addressModalTitle">Thêm địa chỉ mới</h3>
+        <input id="addressName" placeholder="Tên địa chỉ (Nhà riêng, Công ty...)" class="w-full border border-gray-300 rounded-2xl px-5 py-4 mb-4">
+        <textarea id="addressDetail" rows="3" placeholder="Chi tiết địa chỉ" class="w-full border border-gray-300 rounded-2xl px-5 py-4 mb-4"></textarea>
+        <div class="flex gap-4">
+            <button onclick="closeAddressModal()" class="flex-1 py-4 border border-gray-300 rounded-3xl">Hủy</button>
+            <button onclick="saveAddress()" class="flex-1 bg-cyan-600 text-white py-4 rounded-3xl">Lưu địa chỉ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====================== DỮ LIỆU LOCALSTORAGE ======================
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let addresses = JSON.parse(localStorage.getItem('addresses')) || [];
+let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+// Switch tab
+function switchTab(n) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById('tab-' + n).classList.remove('hidden');
+    document.querySelectorAll('.tab-item').forEach((el, i) => el.classList.toggle('active', i === n));
+}
+
+// ====================== TAB 1: ĐƠN HÀNG ======================
+function renderMyOrders() {
+    const container = document.getElementById('ordersList');
+    container.innerHTML = '';
+    if (orders.length === 0) {
+        container.innerHTML = `<p class="text-center py-12 text-gray-500">Bạn chưa có đơn hàng nào.</p>`;
+        return;
+    }
+    orders.forEach(order => {
+        const html = `
+            <div onclick="showOrderDetail('${order.id}')" class="bg-white border rounded-3xl p-6 flex justify-between items-center hover:shadow-md cursor-pointer">
+                <div>
+                    <div class="font-medium">${order.id}</div>
+                    <div class="text-sm text-gray-500">${order.date}</div>
+                </div>
+                <div class="text-right">
+                    <span class="px-5 py-1 rounded-3xl text-xs font-medium ${order.status === 'Hoàn thành' ? 'bg-green-100 text-green-700' : order.status === 'Đang giao' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">
+                        ${order.status}
+                    </span>
+                    <div class="text-cyan-600 font-semibold mt-2">${order.total.toLocaleString('vi-VN')}đ</div>
+                </div>
+            </div>`;
+        container.innerHTML += html;
+    });
+}
+
+// ====================== XEM CHI TIẾT ĐƠN HÀNG (TIMELINE ĐÃ SỬA) ======================
+function showOrderDetail(id) {
+    const order = orders.find(o => o.id === id);
+    if (!order) return alert("Không tìm thấy đơn hàng!");
+
+    let itemsHTML = order.items.map(item => `
+        <div class="flex justify-between py-3 border-b">
+            <span class="font-medium">${item.name} × ${item.quantity || 1}</span>
+            <span class="font-medium">${(parseInt(item.price) * (item.quantity || 1)).toLocaleString('vi-VN')}đ</span>
+        </div>`).join('');
+
+    // ===== TIMELINE MỚI: Bước đầu "ĐANG XỬ LÝ" LUÔN XANH =====
+    const status = order.status || 'Đang xử lý';
+    const steps = [
+        { num: 1, text: 'ĐANG XỬ LÝ', active: true },                    // Luôn xanh
+        { num: 2, text: 'ĐANG GIAO',   active: status === 'Đang giao' || status === 'Hoàn thành' },
+        { num: 3, text: 'HOÀN THÀNH',  active: status === 'Hoàn thành' }
+    ];
+
+    let timelineHTML = `<div class="flex justify-between items-center">`;
+    steps.forEach((step, index) => {
+        const color = step.active ? 'bg-green-500' : 'bg-gray-300';
+        const textColor = step.active ? 'text-white' : 'text-gray-400';
+
+        timelineHTML += `
+            <div class="flex-1 text-center">
+                <div class="w-8 h-8 mx-auto ${color} ${textColor} rounded-full flex items-center justify-center text-sm font-medium">${step.num}</div>
+                <p class="text-xs mt-2 ${step.active ? 'font-semibold' : ''}">${step.text}</p>
+            </div>`;
+        if (index < steps.length - 1) {
+            timelineHTML += `<div class="flex-1 h-0.5 ${step.active ? 'bg-cyan-600' : 'bg-gray-300'}"></div>`;
+        }
+    });
+    timelineHTML += `</div>`;
+
+    const modalHTML = `
+        <div class="space-y-8">
+            <!-- Timeline động -->
+            ${timelineHTML}
+
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <div class="flex justify-between">
+                        <div><p class="text-gray-500 text-sm">MÃ ĐƠN HÀNG</p><p class="font-bold text-xl">${order.id}</p></div>
+                        <div class="text-right"><p class="text-gray-500 text-sm">THỜI GIAN ĐẶT</p><p class="font-medium">${order.date}</p></div>
+                    </div>
+                    <div class="mt-8"><p class="text-gray-500 text-sm">ĐỊA CHỈ NHẬN HÀNG</p><p class="font-medium">${order.address || '123 Đường ABC, Quận 1, TP.HCM'}</p></div>
+                    <div class="mt-8">
+                        <p class="text-gray-500 text-sm">NHÂN VIÊN GIAO HÀNG</p>
+                        <div class="flex items-center gap-3 mt-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center text-2xl">🚚</div>
+                            <div>
+                                <p class="font-semibold">Chưa gán</p>
+                                <p class="text-sm text-gray-500">SĐT: Chưa có</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-3xl p-6">
+                    <h3 class="font-semibold mb-4">TỔNG KẾT ĐƠN</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between"><span>Tiền hàng</span><span>${order.total.toLocaleString('vi-VN')}đ</span></div>
+                        <div class="flex justify-between"><span>Phí vận chuyển</span><span class="text-green-600">Miễn phí</span></div>
+                        <div class="flex justify-between text-xl font-bold border-t pt-4"><span>Tổng cộng</span><span class="text-red-600">${order.total.toLocaleString('vi-VN')}đ</span></div>
+                    </div>
+                    <button onclick="printInvoice('${order.id}')" class="mt-8 w-full bg-black text-white py-4 rounded-3xl flex items-center justify-center gap-3 hover:bg-cyan-600">
+                        <i class="fa-solid fa-print"></i> IN HÓA ĐƠN
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="font-semibold mb-4">SẢN PHẨM TRONG ĐƠN</h3>
+                ${itemsHTML}
+            </div>
+
+            <div class="flex justify-center gap-6 mt-10">
+                <button onclick="closeOrderDetail()" class="px-10 py-4 border border-gray-300 rounded-3xl font-medium">Quay lại</button>
+                <button onclick="callShipper()" class="px-10 py-4 bg-green-600 text-white rounded-3xl flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-phone"></i> GỌI SHIPPER
+                </button>
+            </div>
+        </div>`;
+
+    document.getElementById('modalDetailContent').innerHTML = modalHTML;
+    document.getElementById('orderDetailModal').classList.remove('hidden');
+}
+
+function closeOrderDetail() {
+    document.getElementById('orderDetailModal').classList.add('hidden');
+}
+
+function printInvoice(id) {
+    alert(`📄 Đang in hóa đơn cho đơn ${id}...`);
+}
+
+function callShipper() {
+    alert("📞 Đang gọi shipper...");
+}
+
+// ====================== TAB 2 & TAB 3 (giữ nguyên) ======================
+function renderAddresses() {
+    const container = document.getElementById('addressList');
+    container.innerHTML = '';
+    if (addresses.length === 0) {
+        container.innerHTML = `<p class="text-center py-8 text-gray-500">Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ giao hàng.</p>`;
+        return;
+    }
+    addresses.forEach((addr, index) => {
+        const html = `
+            <div class="border rounded-3xl p-6 flex justify-between items-center">
+                <div>
+                    <p class="font-medium">${addr.name}</p>
+                    <p class="text-gray-600">${addr.detail}</p>
+                    ${addr.isDefault ? '<span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-3xl">Mặc định</span>' : ''}
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="setDefaultAddress(${index}); event.stopImmediatePropagation()" class="text-cyan-600 text-sm">Đặt mặc định</button>
+                    <button onclick="editAddress(${index}); event.stopImmediatePropagation()" class="text-cyan-600 text-sm">Sửa</button>
+                    <button onclick="deleteAddress(${index}); event.stopImmediatePropagation()" class="text-red-500 text-sm">Xóa</button>
+                </div>
+            </div>`;
+        container.innerHTML += html;
+    });
+}
+
+function showAddAddressModal() {
+    document.getElementById('addressModalTitle').textContent = 'Thêm địa chỉ mới';
+    document.getElementById('addressName').value = '';
+    document.getElementById('addressDetail').value = '';
+    document.getElementById('addressModal').classList.remove('hidden');
+}
+
+function closeAddressModal() {
+    document.getElementById('addressModal').classList.add('hidden');
+}
+
+function saveAddress() {
+    const name = document.getElementById('addressName').value.trim();
+    const detail = document.getElementById('addressDetail').value.trim();
+    if (!name || !detail) return alert("Vui lòng nhập đầy đủ thông tin");
+
+    addresses.push({ name, detail, isDefault: addresses.length === 0 });
+    localStorage.setItem('addresses', JSON.stringify(addresses));
+    closeAddressModal();
+    renderAddresses();
+}
+
+function editAddress(index) {
+    alert("Chức năng sửa địa chỉ sẽ được bổ sung ở phiên bản sau");
+}
+
+function deleteAddress(index) {
+    if (confirm("Xóa địa chỉ này?")) {
+        addresses.splice(index, 1);
+        localStorage.setItem('addresses', JSON.stringify(addresses));
+        renderAddresses();
+    }
+}
+
+function setDefaultAddress(index) {
+    addresses.forEach(a => a.isDefault = false);
+    addresses[index].isDefault = true;
+    localStorage.setItem('addresses', JSON.stringify(addresses));
+    renderAddresses();
+}
+
+function renderWishlist() {
+    const container = document.getElementById('wishlistGrid');
+    container.innerHTML = '';
+    if (wishlist.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-500">Bạn chưa có sản phẩm yêu thích nào.</p>`;
+        return;
+    }
+    wishlist.forEach((product, index) => {
+        const card = `
+            <div class="bg-white border rounded-3xl overflow-hidden">
+                <img src="${product.img || product.images?.[0] || 'https://picsum.photos/id/1015/400/400'}" class="w-full h-48 object-cover">
+                <div class="p-5">
+                    <p class="text-xs text-gray-500">${product.brand}</p>
+                    <h3 class="font-semibold">${product.name}</h3>
+                    <p class="text-cyan-600 font-bold text-xl mt-1">${product.price.toLocaleString('vi-VN')}đ</p>
+                    <div class="flex gap-3 mt-5">
+                        <button onclick="addToCartFromWishlist(${index}); event.stopImmediatePropagation()" class="flex-1 bg-black text-white py-3 rounded-2xl text-sm">Thêm vào giỏ</button>
+                        <button onclick="removeFromWishlist(${index}); event.stopImmediatePropagation()" class="flex-1 border border-red-300 text-red-500 py-3 rounded-2xl text-sm">Xóa</button>
+                    </div>
+                </div>
+            </div>`;
+        container.innerHTML += card;
+    });
+}
+
+function addToCartFromWishlist(index) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.push(wishlist[index]);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`✅ Đã thêm ${wishlist[index].name} vào giỏ hàng!`);
+}
+
+function removeFromWishlist(index) {
+    if (confirm("Xóa khỏi yêu thích?")) {
+        wishlist.splice(index, 1);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        renderWishlist();
+    }
+}
+
+// ====================== CÁC HÀM KHÁC ======================
+function saveProfile() {
+    const name = document.getElementById('profileName').value;
+    const phone = document.getElementById('profilePhone').value;
+    const email = document.getElementById('profileEmail').value;
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userPhone', phone);
+    localStorage.setItem('userEmail', email);
+    document.getElementById('displayName').textContent = name;
+    document.getElementById('displayEmail').textContent = email;
+    alert("✅ Đã lưu thông tin cá nhân!");
+}
+
+function logout() {
+    if (confirm('Đăng xuất?')) window.location.href = 'index.html';
+}
+
+// ====================== KHỞI CHẠY ======================
+window.addEventListener('load', () => {
+    renderMyOrders();
+    renderAddresses();
+    renderWishlist();
+
+    document.getElementById('displayName').textContent = localStorage.getItem('userName') || 'Nguyễn Văn A';
+    document.getElementById('displayEmail').textContent = localStorage.getItem('userEmail') || 'nguyenvana@gmail.com';
+});
+</script>
+</body>
+</html>

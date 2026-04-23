@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khách hàng - VacuumStore Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+<div class="flex h-screen">
+    <!-- Sidebar giống hệt index.html admin -->
+    <div class="w-72 sidebar text-white p-6 flex flex-col" style="background: linear-gradient(180deg, #1e2937, #0f172a);">
+        <div class="flex items-center gap-3 mb-10 px-3">
+            <i class="fa-solid fa-robot text-4xl"></i>
+            <h1 class="text-3xl font-bold">VacuumStore</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="index.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-box"></i> Quản lý đơn hàng</a>
+            <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</a>
+            <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-warehouse"></i> Kho hàng</a>
+            <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-users"></i> Khách hàng</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <header class="bg-white shadow px-8 py-5 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Quản lý Khách hàng</h1>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <input id="searchInput" type="text" placeholder="Tìm khách hàng..." 
+                           class="bg-gray-100 border border-gray-200 rounded-3xl px-5 py-3 pl-10 w-80 focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <button onclick="refreshData()" class="bg-cyan-600 text-white px-6 py-3 rounded-3xl flex items-center gap-2 hover:bg-cyan-700">
+                    <i class="fa-solid fa-rotate"></i> Làm mới dữ liệu
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <div class="bg-white rounded-3xl shadow overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b text-left text-gray-500">
+                            <th class="px-8 py-5">Khách hàng</th>
+                            <th class="px-8 py-5">Email</th>
+                            <th class="px-8 py-5">Số điện thoại</th>
+                            <th class="px-8 py-5 text-center">Số đơn hàng</th>
+                            <th class="px-8 py-5 text-right">Tổng chi tiêu</th>
+                            <th class="px-8 py-5 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable" class="text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chi tiết đơn hàng -->
+<div id="customerModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div class="bg-white rounded-3xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold" id="modalCustomerName"></h3>
+                <button onclick="closeCustomerModal()" class="text-4xl text-gray-400 hover:text-gray-600">×</button>
+            </div>
+            <div id="modalCustomerContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load tất cả user từ localStorage
+function getAllUsers() {
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    const singleUser = JSON.parse(localStorage.getItem('user'));
+    if (singleUser) {
+        const exists = users.some(u => u.email === singleUser.email);
+        if (!exists) users = [singleUser, ...users];
+    }
+    return users;
+}
+
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+// Render bảng
+function renderCustomers(filtered = '') {
+    const tbody = document.getElementById('customerTable');
+    tbody.innerHTML = '';
+
+    let users = getAllUsers();
+
+    const customerMap = {};
+    orders.forEach(order => {
+        const key = order.customer || 'Khách lạ';
+        if (!customerMap[key]) {
+            customerMap[key] = {
+                name: key,
+                email: order.email || '',
+                phone: order.phone || 'Chưa có',
+                orderCount: 0,
+                totalSpend: 0
+            };
+        }
+        customerMap[key].orderCount++;
+        customerMap[key].totalSpend += (order.total || 0);
+    });
+
+    users.forEach(user => {
+        const key = user.name;
+        if (customerMap[key]) {
+            customerMap[key].email = user.email || customerMap[key].email;
+            customerMap[key].phone = user.phone || customerMap[key].phone;
+        } else {
+            customerMap[key] = {
+                name: user.name,
+                email: user.email || '',
+                phone: user.phone || 'Chưa có',
+                orderCount: 0,
+                totalSpend: 0
+            };
+        }
+    });
+
+    let list = Object.values(customerMap);
+
+    if (filtered) {
+        const term = filtered.toLowerCase();
+        list = list.filter(u => 
+            (u.name && u.name.toLowerCase().includes(term)) ||
+            (u.email && u.email.toLowerCase().includes(term))
+        );
+    }
+
+    if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-gray-500">Chưa có khách hàng nào</td></tr>`;
+        return;
+    }
+
+    list.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50';
+        tr.innerHTML = `
+            <td class="px-8 py-5 font-medium">${user.name}</td>
+            <td class="px-8 py-5">${user.email || 'Chưa có'}</td>
+            <td class="px-8 py-5">${user.phone || 'Chưa có'}</td>
+            <td class="px-8 py-5 text-center">${user.orderCount}</td>
+            <td class="px-8 py-5 text-right font-semibold">${user.totalSpend.toLocaleString('vi-VN')}đ</td>
+            <td class="px-8 py-5 text-center flex gap-3 justify-center">
+                <button onclick="viewCustomerDetail('${user.name}')" class="text-amber-600 hover:underline">Chi tiết</button>
+                <button onclick="editUser('${user.email}')" class="text-cyan-600 hover:underline">Sửa</button>
+                <button onclick="deleteUser('${user.email}')" class="text-red-500 hover:underline">Xóa</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// ==================== HÀM SỬA & XÓA ĐÃ FIX (chỉ sửa 2 phần này) ====================
+function editUser(email) {
+    let users = getAllUsers();
+    let userIndex = users.findIndex(u => u.email === email);
+
+    // Nếu chưa có trong mảng users thì tạo mới
+    if (userIndex === -1) {
+        const newUser = { email: email, name: "Khách hàng", phone: "" };
+        users.push(newUser);
+        userIndex = users.length - 1;
+    }
+
+    const currentName = users[userIndex].name || "Khách hàng";
+    const currentPhone = users[userIndex].phone || "";
+
+    const newName = prompt("Nhập tên mới:", currentName);
+    if (newName === null) return;
+
+    const newPhone = prompt("Nhập số điện thoại mới:", currentPhone);
+    if (newPhone === null) return;
+
+    users[userIndex].name = newName.trim();
+    users[userIndex].phone = newPhone.trim();
+
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Nếu là user đang đăng nhập thì cập nhật luôn key 'user'
+    const currentLoggedUser = JSON.parse(localStorage.getItem('user'));
+    if (currentLoggedUser && currentLoggedUser.email === email) {
+        localStorage.setItem('user', JSON.stringify(users[userIndex]));
+    }
+
+    renderCustomers(document.getElementById('searchInput').value);
+    alert("✅ Đã cập nhật thông tin khách hàng!");
+}
+
+function deleteUser(email) {
+    if (!confirm("Xóa tài khoản này vĩnh viễn?")) return;
+
+    let users = getAllUsers();
+    users = users.filter(u => u.email !== email);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Nếu xóa chính user đang đăng nhập thì xóa key 'user'
+    const currentLoggedUser = JSON.parse(localStorage.getItem('user'));
+    if (currentLoggedUser && currentLoggedUser.email === email) {
+        localStorage.removeItem('user');
+    }
+
+    renderCustomers(document.getElementById('searchInput').value);
+    alert("✅ Đã xóa tài khoản thành công!");
+}
+
+// Các hàm còn lại giữ nguyên
+function viewCustomerDetail(name) {
+    const customerOrders = orders.filter(o => o.customer === name);
+    if (customerOrders.length === 0) {
+        alert("Khách hàng này chưa có đơn hàng nào.");
+        return;
+    }
+    let html = `<div class="space-y-6">`;
+    customerOrders.forEach(order => {
+        html += `
+            <div class="border rounded-3xl p-5">
+                <div class="flex justify-between">
+                    <div><span class="font-medium">${order.id}</span> — ${order.date || 'Chưa có ngày'}</div>
+                    <span class="font-semibold text-cyan-600">${(order.total || 0).toLocaleString('vi-VN')}đ</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Trạng thái: ${order.status || 'Đang xử lý'}</p>
+            </div>`;
+    });
+    html += `</div>`;
+
+    document.getElementById('modalCustomerName').textContent = name;
+    document.getElementById('modalCustomerContent').innerHTML = html;
+    document.getElementById('customerModal').classList.remove('hidden');
+}
+
+function closeCustomerModal() {
+    document.getElementById('customerModal').classList.add('hidden');
+}
+
+function refreshData() {
+    orders = JSON.parse(localStorage.getItem('orders')) || [];
+    renderCustomers(document.getElementById('searchInput').value);
+    alert("✅ Đã cập nhật dữ liệu mới nhất!");
+}
+
+// Tìm kiếm
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    renderCustomers(e.target.value);
+});
+
+// Khởi chạy
+window.addEventListener('load', () => {
+    renderCustomers('');
+});
+</script>
+</body>
+</html>
