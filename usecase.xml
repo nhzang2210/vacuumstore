@@ -1,0 +1,57 @@
+<mxfile>
+  <diagram name="UseCase VacuumStore">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Actors -->
+        <mxCell id="guest" value="Guest" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="customer" value="Customer" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="50" y="250" width="30" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="admin" value="Admin" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="30" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="shipper" value="Shipper" style="shape=umlActor;" vertex="1" parent="1">
+          <mxGeometry x="50" y="580" width="30" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Use Cases -->
+        <mxCell value="Xem sản phẩm" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="80" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Tìm kiếm" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="140" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Đặt hàng" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="260" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Thanh toán" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="380" y="260" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Quản lý sản phẩm" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="420" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Quản lý đơn hàng" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell value="Giao hàng" style="ellipse;" vertex="1" parent="1">
+          <mxGeometry x="200" y="600" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
