@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng thông tin Shipper - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-motorcycle text-cyan-600 text-3xl"></i>
+            <h1 class="text-2xl font-bold tracking-tight"><span class="text-cyan-600">Vacuum</span>Store Shipper</h1>
+        </div>
+        <div id="shipperInfo" class="hidden flex items-center gap-4">
+            <span id="shipperNameText" class="font-medium text-gray-700"></span>
+            <button onclick="shipperLogout()" class="text-red-500 hover:text-red-700 text-sm font-semibold border border-red-200 px-3 py-1.5 rounded-2xl hover:bg-red-50">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 p-6 max-w-4xl w-full mx-auto flex items-center justify-center">
+        
+        <div id="loginForm" class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-2">Shipper Đăng Nhập</h2>
+            <p class="text-gray-500 text-sm text-center mb-6">Nhập chính xác thông tin được đăng ký trên hệ thống Admin</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                    <select id="loginName" class="w-full border border-gray-300 rounded-2xl px-4 py-3.5 focus:outline-none focus:border-cyan-500 bg-white">
+                        <option value="Nguyễn Văn Hải">Nguyễn Văn Hải</option>
+                        <option value="Trần Thị Lan">Trần Thị Lan</option>
+                        <option value="Lê Minh Quân">Lê Minh Quân</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                    <input id="loginPhone" type="text" placeholder="Ví dụ: 0912 345 678" class="w-full border border-gray-300 rounded-2xl px-4 py-3.5 focus:outline-none focus:border-cyan-500">
+                </div>
+                <button onclick="shipperLogin()" class="w-full bg-cyan-600 text-white py-4 rounded-2xl font-semibold hover:bg-cyan-700 transition mt-2 shadow-md">
+                    XÁC NHẬN VÀO HỆ THỐNG
+                </button>
+            </div>
+        </div>
+
+        <div id="shipperDashboard" class="hidden w-full space-y-6 self-start mt-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800">Đơn hàng được giao</h2>
+                <span id="orderCount" class="bg-cyan-100 text-cyan-800 text-sm font-bold px-3 py-1 rounded-full">0 đơn</span>
+            </div>
+
+            <div id="shipperOrderList" class="space-y-4">
+                </div>
+        </div>
+    </main>
+
+<script>
+// Mock data danh sách shipper đồng bộ với admin-orders.html
+const registeredShippers = [
+    { name: "Nguyễn Văn Hải", phone: "0912 345 678" },
+    { name: "Trần Thị Lan", phone: "0987 654 321" },
+    { name: "Lê Minh Quân", phone: "0934 567 890" }
+];
+
+let currentShipper = JSON.parse(localStorage.getItem('currentShipper')) || null;
+
+function shipperLogin() {
+    const name = document.getElementById('loginName').value;
+    const phone = document.getElementById('loginPhone').value.trim();
+
+    // Tìm kiếm kiểm tra độ chính xác (chuẩn hóa khoảng trắng để tránh lỗi gõ dư)
+    const matched = registeredShippers.find(s => s.name === name && s.phone.replace(/\s+/g, '') === phone.replace(/\s+/g, ''));
+
+    if (!matched) {
+        alert("❌ Sai số điện thoại của tài xế này! Vui lòng kiểm tra lại.");
+        return;
+    }
+
+    currentShipper = matched;
+    localStorage.setItem('currentShipper', JSON.stringify(currentShipper));
+    initDashboard();
+}
+
+function shipperLogout() {
+    localStorage.removeItem('currentShipper');
+    currentShipper = null;
+    document.getElementById('loginForm').classList.remove('hidden');
+    document.getElementById('shipperDashboard').classList.add('hidden');
+    document.getElementById('shipperInfo').classList.add('hidden');
+}
+
+function initDashboard() {
+    if (!currentShipper) return;
+    
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('shipperDashboard').classList.remove('hidden');
+    document.getElementById('shipperInfo').classList.remove('hidden');
+    document.getElementById('shipperNameText').textContent = `Chào, ${currentShipper.name}`;
+    
+    renderShipperOrders();
+}
+
+function renderShipperOrders() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const container = document.getElementById('shipperOrderList');
+    container.innerHTML = '';
+
+    // Lọc đơn hàng được gán cho shipper hiện tại
+    const myOrders = orders.filter(o => o.shipper && o.shipper.name === currentShipper.name);
+    document.getElementById('orderCount').textContent = `${myOrders.length} đơn`;
+
+    if (myOrders.length === 0) {
+        container.innerHTML = `
+            <div class="bg-white p-8 text-center rounded-3xl text-gray-400 shadow border border-dashed border-gray-300">
+                <i class="fa-solid fa-box-open text-4xl mb-3"></i>
+                <p>Bạn chưa được gán đơn hàng nào.</p>
+            </div>`;
+        return;
+    }
+
+    myOrders.forEach(order => {
+        let itemsText = order.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+        
+        const card = document.createElement('div');
+        card.className = "bg-white p-6 rounded-3xl shadow border border-gray-100 flex flex-col md:flex-row justify-between gap-4";
+        card.innerHTML = `
+            <div class="space-y-2 flex-1">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl font-bold text-cyan-600">${order.id}</span>
+                    <span class="px-3 py-1 rounded-2xl text-xs font-semibold ${
+                        order.status === 'Hoàn thành' ? 'bg-green-100 text-green-700' : 
+                        order.status === 'Đang giao' ? 'bg-blue-100 text-blue-700' : 
+                        order.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                    }">${order.status}</span>
+                </div>
+                <p class="text-gray-700 font-medium"><i class="fa-solid fa-user text-gray-400 mr-2"></i>${order.customer} - ${order.phone || 'N/A'}</p>
+                <p class="text-gray-600 text-sm"><i class="fa-solid fa-location-dot text-gray-400 mr-2"></i>${order.address || 'Không có địa chỉ'}</p>
+                <p class="text-gray-500 text-xs border-t pt-2 mt-2"><i class="fa-solid fa-layer-group mr-1"></i> ${itemsText}</p>
+            </div>
+            
+            <div class="flex flex-col justify-between items-end gap-4 min-w-[200px]">
+                <div class="text-right">
+                    <span class="text-gray-400 text-xs block">Thu hộ (COD)</span>
+                    <span class="text-xl font-bold text-emerald-600">${order.total.toLocaleString('vi-VN')}đ</span>
+                </div>
+                
+                <div class="w-full">
+                    <select onchange="changeStatusByShipper('${order.id}', this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-cyan-500 font-medium">
+                        <option value="" disabled selected>Cập nhật trạng thái...</option>
+                        <option value="Đang giao" ${order.status === 'Đang giao' ? 'disabled' : ''}>Đang giao hàng</option>
+                        <option value="Hoàn thành" ${order.status === 'Hoàn thành' ? 'disabled' : ''}>Giao thành công</option>
+                        <option value="Đã hủy" ${order.status === 'Đã hủy' ? 'disabled' : ''}>Báo hủy đơn</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function changeStatusByShipper(orderId, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+    const order = orders.find(o => o.id === orderId);
+    
+    if (!order) return;
+    const oldStatus = order.status;
+
+    // ĐỒNG BỘ TRỪ TỒN KHO: Nếu chuyển sang "Hoàn thành" từ trạng thái khác
+    if (newStatus === 'Hoàn thành' && oldStatus !== 'Hoàn thành') {
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const product = products.find(p => p.name === item.name || (p.id && p.id === item.id));
+                if (product) {
+                    const qtySold = parseInt(item.qty || item.quantity || 1);
+                    product.stock = (product.stock || 50) - qtySold;
+                    if (product.stock < 0) product.stock = 0;
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    }
+
+    order.status = newStatus;
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    alert(`✅ Đã cập nhật trạng thái đơn ${orderId} thành: ${newStatus}`);
+    renderShipperOrders();
+}
+
+// Chạy khi load trang
+window.addEventListener('load', initDashboard);
+</script>
+</body>
+</html>

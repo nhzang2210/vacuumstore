@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện Shipper - VacuumStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-motorcycle text-cyan-600 text-3xl"></i>
+            <h1 class="text-2xl font-bold tracking-tight"><span class="text-cyan-600">Vacuum</span>Store Shipper</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="shipperNameText" class="font-medium text-gray-700"></span>
+            <button onclick="shipperLogout()" class="text-red-500 hover:text-red-700 text-sm font-semibold border border-red-200 px-3 py-1.5 rounded-2xl hover:bg-red-50">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 p-6 max-w-4xl w-full mx-auto space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">Đơn hàng của tôi được giao</h2>
+            <span id="orderCount" class="bg-cyan-100 text-cyan-800 text-sm font-bold px-3 py-1 rounded-full">0 đơn</span>
+        </div>
+
+        <div id="shipperOrderList" class="space-y-4">
+            </div>
+    </main>
+
+<script>
+let currentShipper = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+// Kiểm tra bảo mật: Nếu không phải shipper, không cho xem trang này và đuổi về login
+if (!currentShipper || currentShipper.role !== 'shipper') {
+    alert("🔒 Vui lòng đăng nhập bằng tài khoản Shipper để truy cập!");
+    window.location.href = "login.html";
+}
+
+function initDashboard() {
+    document.getElementById('shipperNameText').textContent = `Chào tài xế, ${currentShipper.name}`;
+    renderShipperOrders();
+}
+
+function renderShipperOrders() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const container = document.getElementById('shipperOrderList');
+    container.innerHTML = '';
+
+    // Lọc các đơn hàng trong hệ thống được Admin gán cho Shipper này
+    const myOrders = orders.filter(o => o.shipper && o.shipper.name === currentShipper.name);
+    document.getElementById('orderCount').textContent = `${myOrders.length} đơn`;
+
+    if (myOrders.length === 0) {
+        container.innerHTML = `
+            <div class="bg-white p-8 text-center rounded-3xl text-gray-400 shadow border border-dashed border-gray-300">
+                <i class="fa-solid fa-box-open text-4xl mb-3"></i>
+                <p>Bạn hiện không có đơn hàng nào cần đi giao.</p>
+            </div>`;
+        return;
+    }
+
+    myOrders.forEach(order => {
+        let itemsText = order.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+        
+        const card = document.createElement('div');
+        card.className = "bg-white p-6 rounded-3xl shadow border border-gray-100 flex flex-col md:flex-row justify-between gap-4";
+        card.innerHTML = `
+            <div class="space-y-2 flex-1">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl font-bold text-cyan-600">${order.id}</span>
+                    <span class="px-3 py-1 rounded-2xl text-xs font-semibold ${
+                        order.status === 'Hoàn thành' ? 'bg-green-100 text-green-700' : 
+                        order.status === 'Đang giao' ? 'bg-blue-100 text-blue-700' : 
+                        order.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                    }">${order.status}</span>
+                </div>
+                <p class="text-gray-700 font-medium"><i class="fa-solid fa-user text-gray-400 mr-2"></i>${order.customer} - ${order.phone || 'N/A'}</p>
+                <p class="text-gray-600 text-sm"><i class="fa-solid fa-location-dot text-gray-400 mr-2"></i>${order.address || 'Không có địa chỉ'}</p>
+                <p class="text-gray-500 text-xs border-t pt-2 mt-2"><i class="fa-solid fa-layer-group mr-1"></i> ${itemsText}</p>
+            </div>
+            
+            <div class="flex flex-col justify-between items-end gap-4 min-w-[200px]">
+                <div class="text-right">
+                    <span class="text-gray-400 text-xs block">Tiền cần thu (COD)</span>
+                    <span class="text-xl font-bold text-emerald-600">${order.total.toLocaleString('vi-VN')}đ</span>
+                </div>
+                
+                <div class="w-full">
+                    <select onchange="updateStatusByShipper('${order.id}', this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-cyan-500 font-medium">
+                        <option value="" disabled selected>Cập nhật tiến độ...</option>
+                        <option value="Đang giao" ${order.status === 'Đang giao' ? 'disabled' : ''}>Đang đi giao</option>
+                        <option value="Hoàn thành" ${order.status === 'Hoàn thành' ? 'disabled' : ''}>Giao hàng thành công</option>
+                        <option value="Đã hủy" ${order.status === 'Đã hủy' ? 'disabled' : ''}>Hủy đơn/Khách không nhận</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function updateStatusByShipper(orderId, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+    const order = orders.find(o => o.id === orderId);
+    
+    if (!order) return;
+    const oldStatus = order.status;
+
+    // Trừ tồn kho tự động nếu trạng thái chuyển sang hoàn thành thành công
+    if (newStatus === 'Hoàn thành' && oldStatus !== 'Hoàn thành') {
+        if (order.items) {
+            order.items.forEach(item => {
+                const product = products.find(p => p.name === item.name || p.id === item.id);
+                if (product) {
+                    product.stock = Math.max(0, (product.stock || 50) - (parseInt(item.qty) || 1));
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    }
+
+    order.status = newStatus;
+    localStorage.setItem('orders', JSON.stringify(orders));
+    alert(`✅ Đã lưu trạng thái: ${newStatus}`);
+    renderShipperOrders();
+}
+
+function shipperLogout() {
+    localStorage.removeItem('currentUser');
+    window.location.href = "login.html";
+}
+
+window.addEventListener('load', initDashboard);
+</script>
+</body>
+</html>

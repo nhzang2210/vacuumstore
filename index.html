@@ -300,32 +300,33 @@ window.addEventListener('load', () => {
 <!-- Script user dropdown & logout (giữ nguyên) -->
 <script>
 function updateUserDropdown() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const dropdown = document.getElementById('dropdownMenu');
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const dropdown = document.getElementById('userDropdownMenu'); // ID dropdown navbar của bạn
+    if (!dropdown) return;
+
     if (user) {
+        // Kiểm tra vai trò để đặt link cho đúng giao diện quản lý
+        let profileLink = "user-profile.html"; // Mặc định khách hàng
+        if (user.role === 'admin') profileLink = "index.html";
+        if (user.role === 'shipper') profileLink = "shipper-dashboard.html";
+
         dropdown.innerHTML = `
-            <div class="px-6 py-3 border-b">
-                <p class="font-medium">${user.name}</p>
-                <p class="text-xs text-gray-500">${user.email}</p>
+            <div class="px-6 py-3 border-b bg-gray-50 rounded-t-2xl">
+                <p class="font-bold text-gray-800">${user.name}</p>
+                <p class="text-xs text-gray-500">${user.email || 'Tài xế giao hàng'}</p>
             </div>
-            <a href="user-profile.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50">
-                <i class="fa-solid fa-user"></i> Tài khoản của tôi
+            <a href="${profileLink}" class="flex items-center gap-3 px-6 py-4 hover:bg-cyan-50 transition">
+                <i class="fa-solid fa-rectangle-list text-cyan-600"></i> Trang làm việc của tôi
             </a>
-            <a href="user-profile.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50">
-                <i class="fa-solid fa-receipt"></i> Đơn hàng của tôi
-            </a>
-            <button onclick="logout()" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 w-full text-left text-red-500">
+            <button onclick="logout()" class="flex items-center gap-3 px-6 py-4 hover:bg-red-50 w-full text-left text-red-500 font-medium border-t">
                 <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
             </button>
         `;
     } else {
+        // Khi chưa đăng nhập thì hiện nút Đăng nhập / Đăng ký như bình thường
         dropdown.innerHTML = `
-            <a href="register.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50">
-                <i class="fa-solid fa-user-plus"></i> Đăng ký
-            </a>
-            <a href="login.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50">
-                <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
-            </a>
+            <a href="register.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50"><i class="fa-solid fa-user-plus"></i> Đăng ký</a>
+            <a href="login.html" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</a>
         `;
     }
 }

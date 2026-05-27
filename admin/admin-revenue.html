@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Doanh thu - VacuumStore Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+<div class="flex h-screen">
+    <div class="w-72 text-white p-6 flex flex-col" style="background: linear-gradient(180deg, #1e2937, #0f172a);">
+        <div class="flex items-center gap-3 mb-10 px-3">
+            <i class="fa-solid fa-robot text-4xl"></i>
+            <h1 class="text-3xl font-bold">VacuumStore</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="index.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
+            <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+                <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
+            </a>
+            <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+                <i class="fa-solid fa-box"></i> Sản phẩm
+            </a>
+            <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+                <i class="fa-solid fa-users"></i> Khách hàng
+            </a>
+            <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+                <i class="fa-solid fa-warehouse"></i> Kho hàng
+            </a>
+            <a href="admin-revenue.html" class="flex items-center gap-3 px-5 py-4 bg-cyan-600 rounded-2xl font-medium shadow-lg shadow-cyan-600/30">
+                <i class="fa-solid fa-chart-line"></i> Doanh thu
+            </a>
+        </nav>
+    </div>
+
+    <div class="flex-1 flex flex-col overflow-y-auto">
+        <header class="bg-white shadow-sm px-10 py-6 flex justify-between items-center sticky top-0 z-10">
+            <h2 class="text-2xl font-bold text-gray-800">Báo cáo tình hình Doanh thu</h2>
+            <div class="flex items-center gap-3">
+                <label class="text-sm font-medium text-gray-500 mr-1">Xem thống kê:</label>
+                <select id="filterType" onchange="calculateRevenue()" class="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-2xl p-3 font-semibold focus:outline-none focus:border-cyan-600 min-w-[160px]">
+                    <option value="date" selected>Theo Ngày</option>
+                    <option value="week">Theo Tuần</option>
+                    <option value="month">Theo Tháng</option>
+                    <option value="quarter">Theo Quý</option>
+                    <option value="year">Theo Năm</option>
+                </select>
+                <button onclick="calculateRevenue()" class="bg-cyan-600 text-white p-3 rounded-2xl hover:bg-cyan-700 transition" title="Làm mới dữ liệu">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-10 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div class="space-y-1">
+                        <span class="text-sm font-medium text-gray-400">Tổng doanh thu thu về (Đã giao)</span>
+                        <h3 id="txtRealRevenue" class="text-3xl font-bold text-emerald-600">0đ</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div class="space-y-1">
+                        <span class="text-sm font-medium text-gray-400">Đơn hàng thành công</span>
+                        <h3 id="txtSuccessCount" class="text-3xl font-bold text-gray-800">0 đơn</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div class="space-y-1">
+                        <span class="text-sm font-medium text-gray-400">Đơn hàng bị hủy</span>
+                        <h3 id="txtCancelCount" class="text-3xl font-bold text-red-500">0 đơn</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 text-2xl">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                <div class="mb-4">
+                    <h3 class="font-bold text-lg text-gray-800">Biểu đồ xu hướng tổng quan</h3>
+                    <p class="text-gray-400 text-sm">Trực quan hóa doanh số bán hàng theo mốc thời gian lựa chọn</p>
+                </div>
+                <div class="w-full relative" style="height: 350px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 id="tableTitle" class="font-bold text-lg text-gray-800">Chi tiết doanh thu tích lũy</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm font-semibold border-b border-gray-100">
+                                <th id="thTimeLabel" class="px-8 py-4">Mốc Thời Gian</th>
+                                <th class="px-8 py-4 text-center">Đơn thành công</th>
+                                <th class="px-8 py-4 text-center">Đơn bị hủy</th>
+                                <th class="px-8 py-4 text-right">Doanh thu thu về</th>
+                            </tr>
+                        </thead>
+                        <tbody id="revenueTableBody" class="text-gray-600 text-sm divide-y divide-gray-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+// Khai báo biến toàn cục giữ thực thể biểu đồ để hủy vẽ lại khi thay đổi bộ lọc
+let myChart = null;
+
+function parseDateString(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    return null;
+}
+
+function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    return weekNo;
+}
+
+function calculateRevenue() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const filterType = document.getElementById('filterType').value;
+    
+    let totalRevenue = 0;
+    let successCount = 0;
+    let cancelCount = 0;
+    
+    const reportData = {};
+
+    const labels = {
+        date: "Ngày đặt hàng",
+        week: "Tuần",
+        month: "Tháng / Năm",
+        quarter: "Quý / Năm",
+        year: "Năm"
+    };
+    document.getElementById('thTimeLabel').textContent = labels[filterType];
+    document.getElementById('tableTitle').textContent = `Chi tiết báo cáo thống kê: ${labels[filterType]}`;
+
+    orders.forEach(order => {
+        const total = parseInt(order.total) || 0;
+        const dateObj = parseDateString(order.date);
+        
+        if (!dateObj) return;
+
+        const year = dateObj.getFullYear();
+        const month = dateObj.getMonth() + 1;
+        let timeKey = "";
+
+        switch (filterType) {
+            case 'date':
+                timeKey = order.date;
+                break;
+            case 'week':
+                timeKey = `Tuần ${getWeekNumber(dateObj)}-${year}`;
+                break;
+            case 'month':
+                timeKey = `T Thg ${month < 10 ? '0' + month : month}/${year}`;
+                break;
+            case 'quarter':
+                timeKey = `Quý ${Math.ceil(month / 3)}/${year}`;
+                break;
+            case 'year':
+                timeKey = `Năm ${year}`;
+                break;
+        }
+
+        if (!reportData[timeKey]) {
+            reportData[timeKey] = { success: 0, cancel: 0, amount: 0, rawDate: dateObj };
+        }
+
+        if (order.status === "Hoàn thành") {
+            successCount++;
+            totalRevenue += total;
+            reportData[timeKey].success++;
+            reportData[timeKey].amount += total;
+        } else if (order.status === "Đã hủy") {
+            cancelCount++;
+            reportData[timeKey].cancel++;
+        }
+    });
+
+    document.getElementById('txtRealRevenue').textContent = totalRevenue.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('txtSuccessCount').textContent = successCount + ' đơn';
+    document.getElementById('txtCancelCount').textContent = cancelCount + ' đơn';
+
+    // XỬ LÝ ĐỔ DATA VÀO BẢNG (Sắp xếp mới nhất lên đầu)
+    const tbody = document.getElementById('revenueTableBody');
+    tbody.innerHTML = '';
+
+    const tableKeys = Object.keys(reportData).sort((a, b) => reportData[b].rawDate - reportData[a].rawDate);
+
+    if (tableKeys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="px-8 py-12 text-center text-gray-400"><i class="fa-solid fa-chart-pie text-4xl mb-3 block text-gray-300"></i> Chưa có dữ liệu đơn hàng.</td></tr>`;
+        if (myChart) myChart.destroy();
+        return;
+    }
+
+    tableKeys.forEach(key => {
+        const item = reportData[key];
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-gray-50/80 transition";
+        tr.innerHTML = `
+            <td class="px-8 py-5 font-semibold text-gray-800">${key}</td>
+            <td class="px-8 py-5 text-center text-green-600 font-medium">${item.success} đơn</td>
+            <td class="px-8 py-5 text-center text-red-400">${item.cancel} đơn</td>
+            <td class="px-8 py-5 text-right font-bold text-emerald-600">${item.amount.toLocaleString('vi-VN')}đ</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // XỬ LÝ VẼ BIỂU ĐỒ (Sắp xếp cũ đến mới để biểu đồ chạy từ trái sang phải hợp lý)
+    const chartKeys = Object.keys(reportData).sort((a, b) => reportData[a].rawDate - reportData[b].rawDate);
+    const chartLabels = chartKeys;
+    const chartAmounts = chartKeys.map(key => reportData[key].amount);
+
+    renderChart(chartLabels, chartAmounts);
+}
+
+// Hàm khởi tạo và làm mới cấu trúc đồ thị Chart.js
+function renderChart(labels, dataValues) {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    // Nếu biểu đồ cũ đang tồn tại, phải xóa đi để tránh lỗi chồng chéo dữ liệu khi hover chuột
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, {
+        type: 'bar', // Định dạng biểu đồ dạng cột đứng
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu thu thực tế (đ)',
+                data: dataValues,
+                backgroundColor: 'rgba(14, 116, 144, 0.85)', // Màu xanh cyan đồng bộ giao diện
+                borderColor: 'rgb(14, 116, 144)',
+                borderWidth: 1,
+                borderRadius: 12, // Bo góc cho cột sinh động hơn
+                borderSkipped: false,
+                barThickness: chartThicknessByFilter() // Tự điều chỉnh độ dày cột
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { family: 'sans-serif', size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' ' + context.dataset.label + ': ' + context.raw.toLocaleString('vi-VN') + 'đ';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return (value >= 1000000) ? (value / 1000000) + ' Tr' : value.toLocaleString('vi-VN') + 'đ';
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false } // Ẩn đường kẻ sọc ngang dọc
+                }
+            }
+        }
+    });
+}
+
+function chartThicknessByFilter() {
+    const filterType = document.getElementById('filterType').value;
+    if (filterType === 'date') return 20; // Ngày nhiều cột nên làm mỏng
+    if (filterType === 'week') return 35;
+    return 55; // Tháng, Quý, Năm ít cột làm dày lên cho đẹp
+}
+
+// Lắng nghe sự kiện chạy hàm ngay khi trang được nạp thành công
+window.addEventListener('load', calculateRevenue);
+</script>
+</body>
+</html>
