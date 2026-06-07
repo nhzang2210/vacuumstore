@@ -15,22 +15,21 @@
 <body class="bg-gray-100 font-sans">
 
 <div class="flex h-screen">
-    <!-- Sidebar -->
     <div class="w-72 sidebar text-white p-6 flex flex-col">
         <div class="flex items-center gap-3 mb-10 px-3">
             <i class="fa-solid fa-robot text-4xl"></i>
             <h1 class="text-3xl font-bold">VacuumStore</h1>
         </div>
-       <nav class="flex-1 space-y-2">
-    <a href="index.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white"><i class="fa-solid fa-house"></i> Dashboard</a>
-    <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-box"></i> Quản lý đơn hàng</a>
-    <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</a>
-    <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-warehouse"></i> Kho hàng</a>
-    <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-users"></i> Khách hàng</a>
-</nav>
+        <nav class="flex-1 space-y-2">
+            <a href="index.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-box"></i> Quản lý đơn hàng</a>
+            <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</a>
+            <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-warehouse"></i> Kho hàng</a>
+            <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-users"></i> Khách hàng</a>
+            <a href="admin-revenue.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl"><i class="fa-solid fa-chart-line"></i> Doanh thu</a>
+        </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="flex-1 overflow-auto">
         <header class="bg-white shadow px-8 py-5 flex justify-between items-center">
             <h1 class="text-3xl font-bold">Dashboard</h1>
@@ -50,7 +49,6 @@
         </header>
 
         <div class="p-8">
-            <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="stat-card bg-white rounded-3xl p-6 shadow">
                     <div class="flex justify-between items-start">
@@ -91,7 +89,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Đơn hàng gần đây -->
                 <div class="lg:col-span-6 bg-white rounded-3xl shadow p-6">
                     <h2 class="text-xl font-semibold mb-6">Đơn hàng gần đây</h2>
                     <table class="w-full">
@@ -108,7 +105,6 @@
                     </table>
                 </div>
 
-                <!-- Khách hàng gần đây (dữ liệu thật) -->
                 <div class="lg:col-span-6 bg-white rounded-3xl shadow p-6">
                     <h2 class="text-xl font-semibold mb-6">Khách hàng gần đây</h2>
                     <table class="w-full">

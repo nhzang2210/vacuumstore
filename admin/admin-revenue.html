@@ -11,32 +11,32 @@
 <body class="bg-gray-100 font-sans">
 
 <div class="flex h-screen">
-    <div class="w-72 text-white p-6 flex flex-col" style="background: linear-gradient(180deg, #1e2937, #0f172a);">
-        <div class="flex items-center gap-3 mb-10 px-3">
-            <i class="fa-solid fa-robot text-4xl"></i>
-            <h1 class="text-3xl font-bold">VacuumStore</h1>
-        </div>
-        <nav class="flex-1 space-y-2">
-            <a href="index.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
-            <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
-                <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
-            </a>
-            <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
-                <i class="fa-solid fa-box"></i> Sản phẩm
-            </a>
-            <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
-                <i class="fa-solid fa-users"></i> Khách hàng
-            </a>
-            <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
-                <i class="fa-solid fa-warehouse"></i> Kho hàng
-            </a>
-            <a href="admin-revenue.html" class="flex items-center gap-3 px-5 py-4 bg-cyan-600 rounded-2xl font-medium shadow-lg shadow-cyan-600/30">
-                <i class="fa-solid fa-chart-line"></i> Doanh thu
-            </a>
-        </nav>
+    <div class="w-72 sidebar text-white p-6 flex flex-col" style="background: linear-gradient(180deg, #1e2937, #0f172a);">
+    <div class="flex items-center gap-3 mb-10 px-3">
+        <i class="fa-solid fa-robot text-4xl"></i>
+        <h1 class="text-3xl font-bold">VacuumStore</h1>
     </div>
+    <nav class="flex-1 space-y-2">
+        <a href="index.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+            <i class="fa-solid fa-house"></i> Dashboard
+        </a>
+        <a href="admin-orders.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+            <i class="fa-solid fa-box"></i> Quản lý đơn hàng
+        </a>
+        <a href="admin-products.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+            <i class="fa-solid fa-boxes-stacked"></i> Sản phẩm
+        </a>
+        <a href="admin-inventory.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+            <i class="fa-solid fa-warehouse"></i> Kho hàng
+        </a>
+        <a href="admin-customers.html" class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 rounded-2xl">
+            <i class="fa-solid fa-users"></i> Khách hàng
+        </a>
+        <a href="admin-revenue.html" class="flex items-center gap-3 px-5 py-4 bg-white/10 rounded-2xl text-white font-semibold">
+            <i class="fa-solid fa-chart-line"></i> Doanh thu
+        </a>
+    </nav>
+</div>
 
     <div class="flex-1 flex flex-col overflow-y-auto">
         <header class="bg-white shadow-sm px-10 py-6 flex justify-between items-center sticky top-0 z-10">
@@ -102,6 +102,7 @@
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-6 border-b border-gray-100">
                     <h3 id="tableTitle" class="font-bold text-lg text-gray-800">Chi tiết doanh thu tích lũy</h3>
+                    <p class="text-xs text-gray-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i> Bấm vào từng dòng để xem danh sách đơn hàng chi tiết</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -114,7 +115,7 @@
                             </tr>
                         </thead>
                         <tbody id="revenueTableBody" class="text-gray-600 text-sm divide-y divide-gray-100">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -122,9 +123,25 @@
     </div>
 </div>
 
+<div id="detailRevenueModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white w-[700px] max-w-[90%] rounded-3xl shadow-2xl p-8 transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
+        <div class="flex justify-between items-center border-b pb-4 mb-6">
+            <div>
+                <h3 class="text-xl font-bold text-gray-800">Danh sách đơn hàng</h3>
+                <p id="modalTimeSubtitle" class="text-sm text-cyan-600 font-medium mt-1"></p>
+            </div>
+            <button onclick="closeRevenueModal()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div id="modalOrdersContent" class="overflow-y-auto space-y-4 flex-1 pr-2">
+            </div>
+    </div>
+</div>
+
 <script>
-// Khai báo biến toàn cục giữ thực thể biểu đồ để hủy vẽ lại khi thay đổi bộ lọc
 let myChart = null;
+let currentGroupedOrders = {};
 
 function parseDateString(dateStr) {
     if (!dateStr) return null;
@@ -152,6 +169,7 @@ function calculateRevenue() {
     let cancelCount = 0;
     
     const reportData = {};
+    currentGroupedOrders = {};
 
     const labels = {
         date: "Ngày đặt hàng",
@@ -181,7 +199,7 @@ function calculateRevenue() {
                 timeKey = `Tuần ${getWeekNumber(dateObj)}-${year}`;
                 break;
             case 'month':
-                timeKey = `T Thg ${month < 10 ? '0' + month : month}/${year}`;
+                timeKey = `Thg ${month < 10 ? '0' + month : month}/${year}`;
                 break;
             case 'quarter':
                 timeKey = `Quý ${Math.ceil(month / 3)}/${year}`;
@@ -193,7 +211,10 @@ function calculateRevenue() {
 
         if (!reportData[timeKey]) {
             reportData[timeKey] = { success: 0, cancel: 0, amount: 0, rawDate: dateObj };
+            currentGroupedOrders[timeKey] = [];
         }
+
+        currentGroupedOrders[timeKey].push(order);
 
         if (order.status === "Hoàn thành") {
             successCount++;
@@ -210,7 +231,6 @@ function calculateRevenue() {
     document.getElementById('txtSuccessCount').textContent = successCount + ' đơn';
     document.getElementById('txtCancelCount').textContent = cancelCount + ' đơn';
 
-    // XỬ LÝ ĐỔ DATA VÀO BẢNG (Sắp xếp mới nhất lên đầu)
     const tbody = document.getElementById('revenueTableBody');
     tbody.innerHTML = '';
 
@@ -225,7 +245,8 @@ function calculateRevenue() {
     tableKeys.forEach(key => {
         const item = reportData[key];
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-gray-50/80 transition";
+        tr.className = "hover:bg-cyan-50/50 cursor-pointer transition duration-150";
+        tr.setAttribute('onclick', `openRevenueModal('${key}')`);
         tr.innerHTML = `
             <td class="px-8 py-5 font-semibold text-gray-800">${key}</td>
             <td class="px-8 py-5 text-center text-green-600 font-medium">${item.success} đơn</td>
@@ -235,7 +256,6 @@ function calculateRevenue() {
         tbody.appendChild(tr);
     });
 
-    // XỬ LÝ VẼ BIỂU ĐỒ (Sắp xếp cũ đến mới để biểu đồ chạy từ trái sang phải hợp lý)
     const chartKeys = Object.keys(reportData).sort((a, b) => reportData[a].rawDate - reportData[b].rawDate);
     const chartLabels = chartKeys;
     const chartAmounts = chartKeys.map(key => reportData[key].amount);
@@ -243,28 +263,81 @@ function calculateRevenue() {
     renderChart(chartLabels, chartAmounts);
 }
 
-// Hàm khởi tạo và làm mới cấu trúc đồ thị Chart.js
+function openRevenueModal(timeKey) {
+    const modal = document.getElementById('detailRevenueModal');
+    const subtitle = document.getElementById('modalTimeSubtitle');
+    const content = document.getElementById('modalOrdersContent');
+    
+    subtitle.textContent = `Mốc thời gian dữ liệu công khai: ${timeKey}`;
+    content.innerHTML = '';
+
+    const listOrders = currentGroupedOrders[timeKey] || [];
+    
+    if(listOrders.length === 0) {
+        content.innerHTML = `<p class="text-center text-gray-400 py-6">Không tìm thấy thông tin đơn hàng.</p>`;
+    } else {
+        listOrders.forEach(order => {
+            let statusClass = "bg-gray-100 text-gray-600";
+            if (order.status === "Hoàn thành") statusClass = "bg-green-100 text-green-700 font-medium";
+            if (order.status === "Đã hủy") statusClass = "bg-red-100 text-red-600";
+            if (order.status === "Đang xử lý") statusClass = "bg-amber-100 text-amber-700";
+
+            const totalAmount = parseInt(order.total) || 0;
+
+            const card = document.createElement('div');
+            card.className = "border border-gray-100 rounded-2xl p-5 hover:shadow-md transition bg-gray-50/50 flex justify-between items-center";
+            card.innerHTML = `
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-gray-800">${order.id}</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full ${statusClass}">${order.status || 'Đang xử lý'}</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Ngày đặt: ${order.date || 'Chưa cập nhật'}</p>
+                    <p class="text-sm text-gray-600 mt-1"><i class="fa-regular fa-user mr-1 text-xs"></i> Khách hàng: <span class="font-medium">${order.customer || 'Khách vãng lai'}</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-cyan-600">${totalAmount.toLocaleString('vi-VN')}đ</p>
+                </div>
+            `;
+            content.appendChild(card);
+        });
+    }
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('.transform').classList.remove('scale-95');
+    }, 10);
+}
+
+function closeRevenueModal() {
+    const modal = document.getElementById('detailRevenueModal');
+    modal.classList.add('opacity-0');
+    modal.querySelector('.transform').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
 function renderChart(labels, dataValues) {
     const ctx = document.getElementById('revenueChart').getContext('2d');
-    
-    // Nếu biểu đồ cũ đang tồn tại, phải xóa đi để tránh lỗi chồng chéo dữ liệu khi hover chuột
     if (myChart) {
         myChart.destroy();
     }
 
     myChart = new Chart(ctx, {
-        type: 'bar', // Định dạng biểu đồ dạng cột đứng
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
                 label: 'Doanh thu thu thực tế (đ)',
                 data: dataValues,
-                backgroundColor: 'rgba(14, 116, 144, 0.85)', // Màu xanh cyan đồng bộ giao diện
+                backgroundColor: 'rgba(14, 116, 144, 0.85)',
                 borderColor: 'rgb(14, 116, 144)',
                 borderWidth: 1,
-                borderRadius: 12, // Bo góc cho cột sinh động hơn
+                borderRadius: 12,
                 borderSkipped: false,
-                barThickness: chartThicknessByFilter() // Tự điều chỉnh độ dày cột
+                barThickness: chartThicknessByFilter()
             }]
         },
         options: {
@@ -294,7 +367,7 @@ function renderChart(labels, dataValues) {
                     }
                 },
                 x: {
-                    grid: { display: false } // Ẩn đường kẻ sọc ngang dọc
+                    grid: { display: false }
                 }
             }
         }
@@ -303,12 +376,11 @@ function renderChart(labels, dataValues) {
 
 function chartThicknessByFilter() {
     const filterType = document.getElementById('filterType').value;
-    if (filterType === 'date') return 20; // Ngày nhiều cột nên làm mỏng
+    if (filterType === 'date') return 20;
     if (filterType === 'week') return 35;
-    return 55; // Tháng, Quý, Năm ít cột làm dày lên cho đẹp
+    return 55;
 }
 
-// Lắng nghe sự kiện chạy hàm ngay khi trang được nạp thành công
 window.addEventListener('load', calculateRevenue);
 </script>
 </body>

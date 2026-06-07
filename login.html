@@ -31,16 +31,16 @@
 
             <div class="space-y-6">
                 <div>
-                    <label class="block text-sm text-gray-600 mb-2">Tài khoản / Email / Số điện thoại</label>
-                    <input id="email" type="text" placeholder="example@email.com hoặc SĐT Shipper" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-600">
+                    <label class="block text-sm text-gray-600 mb-2">Email</label>
+                    <input id="email" type="email" placeholder="example@email.com" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-2">Mật khẩu</label>
-                    <input id="password" type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-600">
+                    <input id="password" type="password" placeholder="••••••••" class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-cyan-500">
                 </div>
 
                 <button onclick="login()" id="loginBtn"
-                        class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 rounded-3xl font-semibold text-lg transition">
+                        class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 rounded-3xl font-semibold text-lg transition flex items-center justify-center gap-2">
                     Đăng nhập
                 </button>
 
@@ -53,69 +53,46 @@
     </div>
 
 <script>
+// Danh sách tài khoản shipper khớp hoàn toàn với danh sách hệ thống của bạn
+const mockShippers = [
+    { email: "shipper1@vacuumstore.com", password: "123", role: "shipper", name: "Nguyễn Văn Hải" },
+    { email: "shipper2@vacuumstore.com", password: "123", role: "shipper", name: "Trần Thị Lan" },
+    { email: "shipper3@vacuumstore.com", password: "123", role: "shipper", name: "Lê Minh Quân" }
+];
+
 async function login() {
-    const usernameInput = document.getElementById('email').value.trim();
-    const passwordInput = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
     const errorEl = document.getElementById('errorMessage');
-    
     errorEl.classList.add('hidden');
 
-    if (!usernameInput || !passwordInput) {
-        errorEl.textContent = "Vui lòng nhập tài khoản và mật khẩu";
+    if (!email || !password) {
+        errorEl.textContent = "Vui lòng nhập email và mật khẩu";
         errorEl.classList.remove('hidden');
         return;
     }
 
     const btn = document.getElementById('loginBtn');
     btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xác thực...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang đăng nhập...`;
 
-    // ========================================================
-    // BƯỚC 1: KIỂM TRA QUYỀN SHIPPER TRƯỚC (Để tránh bị chặn bởi API Node)
-    // ========================================================
-    const registeredShippers = [
-        { name: "Nguyễn Văn Hải", phone: "0912345678", pass: "123456" },
-        { name: "Trần Thị Lan", phone: "0987654321", pass: "123456" },
-        { name: "Lê Minh Quân", phone: "0934567890", pass: "123456" }
-    ];
-
-    const matchedShipper = registeredShippers.find(s => s.phone === usernameInput && s.pass === passwordInput);
-    
-    if (matchedShipper) {
-        const shipperUser = { name: matchedShipper.name, phone: matchedShipper.phone, role: "shipper" };
-        
-        // Lưu cả 2 key 'user' và 'currentUser' để đồng bộ với tất cả các trang
-        localStorage.setItem('user', JSON.stringify(shipperUser));
-        localStorage.setItem('currentUser', JSON.stringify(shipperUser));
-        localStorage.setItem('token', 'mock-shipper-token-67890');
-        
-        alert(`🚴 Khởi hành đi giao hàng thôi, tài xế ${matchedShipper.name}!`);
-        window.location.href = "shipper-dashboard.html"; // Chuyển hướng ngay sang trang danh sách đơn của shipper
-        return; // Ngắt hàm luôn, không gửi request lên backend nữa
-    }
-
-    // ========================================================
-    // BƯỚC 2: KIỂM TRA QUYỀN ADMIN (Nếu thông tin nhập khớp admin)
-    // ========================================================
-    if (usernameInput === "admin@gmail.com" && passwordInput === "admin123") {
-        const adminUser = { name: "Quản trị viên", email: usernameInput, role: "admin" };
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        localStorage.setItem('currentUser', JSON.stringify(adminUser));
-        localStorage.setItem('token', 'mock-admin-token-12345');
-        
-        alert("🎉 Đăng nhập Admin thành công!");
-        window.location.href = "admin/index.html";
+    // KIỂM TRA TÀI KHOẢN SHIPPER TRƯỚC (Hỗ trợ test không cần qua API backend)
+    const localShipper = mockShippers.find(s => s.email === email && s.password === password);
+    if (localShipper) {
+        localStorage.setItem('token', 'mock-shipper-token-xyz123');
+        localStorage.setItem('user', JSON.stringify(localShipper));
+        alert(`🎉 Đăng nhập quyền [Shipper]: ${localShipper.name} thành công!`);
+        window.location.href = "shipper-dashboard.html";
         return;
     }
 
-    // ========================================================
-    // BƯỚC 3: GỬI LÊN NODEJS SERVER CHO KHÁCH HÀNG THƯỜNG
-    // ========================================================
+    // GỬI REQUEST LÊN BACKEND CHO CÁC QUYỀN KHÁC (ADMIN HOẶC USER)
     try {
         const res = await fetch('http://localhost:3000/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: usernameInput, password: passwordInput })
+            body: JSON.stringify({ email, password })
         });
 
         const data = await res.json();
@@ -123,16 +100,23 @@ async function login() {
         if (res.ok) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
 
-            alert("🎉 Đăng nhập thành công!");
-            window.location.href = "user-profile.html";
+            if (data.user.role === "admin") {
+                alert("🎉 Đăng nhập Admin thành công!");
+                window.location.href = "admin/index.html";
+            } else if (data.user.role === "shipper") {
+                alert("🎉 Đăng nhập Shipper thành công!");
+                window.location.href = "shipper-dashboard.html";
+            } else {
+                alert("🎉 Đăng nhập thành công!");
+                window.location.href = "index.html";
+            }
         } else {
-            errorEl.textContent = data.message || "Tài khoản hoặc mật khẩu không chính xác";
+            errorEl.textContent = data.message || "Email hoặc mật khẩu không chính xác";
             errorEl.classList.remove('hidden');
         }
     } catch (err) {
-        errorEl.textContent = "Không thể kết nối đến máy chủ Backend (NodeJS). Vui lòng kiểm tra lệnh 'node server.js' đã chạy chưa.";
+        errorEl.textContent = "Không kết nối được server. Kiểm tra backend đang chạy chưa (node server.js)";
         errorEl.classList.remove('hidden');
     } finally {
         btn.disabled = false;

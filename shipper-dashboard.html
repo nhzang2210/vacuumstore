@@ -28,12 +28,12 @@
             <span id="orderCount" class="bg-cyan-100 text-cyan-800 text-sm font-bold px-3 py-1 rounded-full">0 đơn</span>
         </div>
 
-        <div id="shipperOrderList" class="space-y-4">
-            </div>
+        <div id="shipperOrderList" class="space-y-4"></div>
     </main>
 
 <script>
-let currentShipper = JSON.parse(localStorage.getItem('currentUser')) || null;
+// ĐỒNG BỘ: Đổi từ 'currentUser' sang 'user' để khớp hoàn toàn với trang login
+let currentShipper = JSON.parse(localStorage.getItem('user')) || null;
 
 // Kiểm tra bảo mật: Nếu không phải shipper, không cho xem trang này và đuổi về login
 if (!currentShipper || currentShipper.role !== 'shipper') {
@@ -65,7 +65,7 @@ function renderShipperOrders() {
     }
 
     myOrders.forEach(order => {
-        let itemsText = order.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+        let itemsText = order.items ? order.items.map(i => `${i.name} (x${i.qty})`).join(', ') : 'Không rõ sản phẩm';
         
         const card = document.createElement('div');
         card.className = "bg-white p-6 rounded-3xl shadow border border-gray-100 flex flex-col md:flex-row justify-between gap-4";
@@ -87,7 +87,7 @@ function renderShipperOrders() {
             <div class="flex flex-col justify-between items-end gap-4 min-w-[200px]">
                 <div class="text-right">
                     <span class="text-gray-400 text-xs block">Tiền cần thu (COD)</span>
-                    <span class="text-xl font-bold text-emerald-600">${order.total.toLocaleString('vi-VN')}đ</span>
+                    <span class="text-xl font-bold text-emerald-600">${(order.total || 0).toLocaleString('vi-VN')}đ</span>
                 </div>
                 
                 <div class="w-full">
@@ -132,7 +132,9 @@ function updateStatusByShipper(orderId, newStatus) {
 }
 
 function shipperLogout() {
-    localStorage.removeItem('currentUser');
+    // ĐỒNG BỘ: Xóa đúng key 'user' và 'token' khi đăng xuất
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     window.location.href = "login.html";
 }
 

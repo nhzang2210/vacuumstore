@@ -8,8 +8,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @media print {
-            nav, .no-print { display: none !important; }
-            body { background: white; }
+            /* Ẩn thanh menu và các nút điều hướng không cần in */
+            nav, .no-print, button, a { 
+                display: none !important; 
+            }
+            /* Ép nền trắng và thu nhỏ khoảng cách để vừa khít 1 trang A4 */
+            body { 
+                background: white !important; 
+                color: black !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Loại bỏ shadow bóng mờ và đặt viền mảnh chuẩn hóa đơn */
+            .max-w-2xl {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+            }
+            .bg-white {
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb !important;
+                border-radius: 1rem !important;
+                padding: 1.5rem !important;
+            }
+            /* Cấu hình khổ giấy A4 dọc và khoảng cách lề an toàn */
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm !important;
+            }
         }
     </style>
 </head>
@@ -42,13 +69,11 @@
     <p class="text-gray-600 text-lg">Cảm ơn bạn đã mua hàng tại VacuumStore</p>
 
     <div class="mt-10 bg-white rounded-3xl shadow p-8 text-left">
-        <!-- Mã đơn hàng -->
         <div class="flex justify-between items-center border-b pb-4">
             <p class="font-semibold text-lg">Mã đơn hàng</p>
             <p class="text-xl font-bold text-cyan-600" id="orderId">#VS20260422-7842</p>
         </div>
 
-        <!-- Thông tin khách hàng -->
         <div class="mt-6 grid grid-cols-1 gap-4">
             <div>
                 <p class="text-sm text-gray-500">Khách hàng</p>
@@ -62,9 +87,12 @@
                 <p class="text-sm text-gray-500">Địa chỉ nhận hàng</p>
                 <p class="font-medium" id="customerAddress">123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</p>
             </div>
+            <div>
+                <p class="text-sm text-gray-500">Phương thức thanh toán</p>
+                <p class="font-medium text-cyan-600" id="paymentMethod">Chưa rõ</p>
+            </div>
         </div>
 
-        <!-- Ngày giao dự kiến -->
         <div class="mt-8 bg-cyan-50 border border-cyan-200 rounded-2xl p-5">
             <p class="flex items-center gap-2 text-cyan-700 font-medium">
                 <i class="fa-solid fa-truck"></i>
@@ -74,22 +102,20 @@
             <p class="text-sm text-cyan-600 mt-1">Giao hàng trong 2-3 ngày làm việc</p>
         </div>
 
-        <!-- Sản phẩm -->
         <div class="mt-8">
             <p class="text-sm text-gray-500 mb-3">Sản phẩm đã đặt</p>
             <div id="orderItems" class="space-y-4"></div>
         </div>
 
-        <!-- Tổng tiền -->
         <div class="border-t mt-8 pt-6 flex justify-between text-2xl font-bold">
-            <span>Tổng thanh toán</span>
+            <span>Tổng thanh toán khi nhận</span>
             <span id="finalTotal" class="text-cyan-600">0đ</span>
         </div>
     </div>
 
-    <div class="mt-10 flex flex-col gap-4">
+    <div class="mt-10 flex flex-col gap-4 no-print">
         <button onclick="printInvoice()" 
-                class="print-btn flex items-center justify-center gap-3 bg-cyan-600 text-white py-5 rounded-3xl text-lg font-semibold hover:bg-cyan-700 transition">
+                class="flex items-center justify-center gap-3 bg-cyan-600 text-white py-5 rounded-3xl text-lg font-semibold hover:bg-cyan-700 transition">
             <i class="fa-solid fa-print"></i>
             IN HÓA ĐƠN
         </button>
@@ -104,19 +130,22 @@
 </div>
 
 <script>
-// Lấy giỏ hàng
-const cart = JSON.parse(localStorage.getItem('cart')) || [];
+const orders = JSON.parse(localStorage.getItem('orders')) || [];
+const urlParams = new URLSearchParams(window.location.search);
+const currentOrderId = urlParams.get('orderId');
+const currentOrder = currentOrderId ? orders.find(o => o.id === currentOrderId) : orders[0];
 
-// Render trang xác nhận
 function renderConfirmation() {
-    let subtotal = 0;
-    let html = '';
+    if (!currentOrder) {
+        document.getElementById('orderItems').innerHTML = '<p class="text-gray-500">Không tìm thấy thông tin đơn hàng.</p>';
+        return;
+    }
 
-    cart.forEach(item => {
-        const qty = item.quantity || 1;
+    let html = '';
+    currentOrder.items.forEach(item => {
+        const qty = item.qty || item.quantity || 1;
         const price = parseInt(item.price);
         const total = price * qty;
-        subtotal += total;
 
         html += `
             <div class="flex justify-between items-center">
@@ -129,24 +158,24 @@ function renderConfirmation() {
     });
 
     document.getElementById('orderItems').innerHTML = html;
-    document.getElementById('finalTotal').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
 
-    // Thông tin khách hàng (bạn có thể thay đổi động sau)
-    document.getElementById('customerName').textContent = "Nguyễn Văn A";
-    document.getElementById('customerPhone').textContent = "0912 345 678";
-    document.getElementById('customerAddress').textContent = "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh";
+    if (currentOrder.paymentMethod === "Chuyển khoản" || currentOrder.paymentMethod === "bank") {
+        document.getElementById('finalTotal').textContent = '0đ';
+        document.getElementById('paymentMethod').textContent = 'Chuyển khoản qua mã QR (Đã thanh toán)';
+    } else {
+        document.getElementById('finalTotal').textContent = currentOrder.total.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('paymentMethod').textContent = 'Thanh toán tiền mặt khi nhận hàng (COD)';
+    }
 
-    // Mã đơn hàng ngẫu nhiên
-    document.getElementById('orderId').textContent = "#VS" + Date.now().toString().slice(-8);
+    document.getElementById('customerName').textContent = currentOrder.customer || "Chưa cập nhật";
+    document.getElementById('customerPhone').textContent = currentOrder.phone || "Chưa cập nhật";
+    document.getElementById('customerAddress').textContent = currentOrder.address || "Chưa cập nhật";
+    document.getElementById('orderId').textContent = currentOrder.id;
 }
 
-// In hóa đơn
 function printInvoice() {
     window.print();
 }
-
-// Xóa giỏ hàng sau khi xác nhận
-localStorage.removeItem('cart');
 
 renderConfirmation();
 </script>
